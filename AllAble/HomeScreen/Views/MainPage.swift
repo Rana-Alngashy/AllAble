@@ -11,111 +11,99 @@ import SwiftUI
 struct MainPage: View {
     
     @StateObject private var viewModel = MainPageViewModel()
-    
     var body: some View {
         ZStack {
-            
-            // Background
-            Color(red: 254/255, green: 251/255, blue: 244/255)
+            Color(#colorLiteral(red: 0.98, green: 0.96, blue: 0.90, alpha: 1))
                 .ignoresSafeArea()
-            
-            VStack(alignment: .leading, spacing: 24) {
+            VStack {
                 
-                // MARK: - Top Toolbar
-                HStack(spacing: 20) {
-                    Button { viewModel.openProfile() } label: {
-                        Image(systemName: "person.crop.circle")
-                            .font(.system(size: 50))
-                            .foregroundColor(.black)
-                    }
-                    
-                    Button { viewModel.openNotifications() } label: {
-                        Image(systemName: "bell")
-                            .font(.system(size: 50))
-                            .foregroundColor(.black)
-                    }
-                    
+                //tool bar
+                HStack {
                     Spacer()
-                }
-                .padding(.horizontal)
-                .padding(.top, 10)
-                
-                HStack(alignment: .center) {
                     
-                    // MARK: - Dose Card
-                    VStack(alignment: .leading, spacing: 12) {
+                    Button(action: {
+                        // go to notifications
+                    }) {
+                        Image(systemName: "bell.fill")
+                            .font(.system(size: 50))
+                            .foregroundColor(.yellow)
+                    }
+                    
+                    Button(action: {
+                        // go to account
+                    }) {
+                        Image(systemName: "person.circle.fill")
+                            .font(.system(size: 50))
+                            .foregroundColor(.yellow)
+                    }
+                }
+                .padding(.horizontal, 30)
+                .padding(.top, 20)
+                
+                Spacer()
+                
+                HStack(alignment: .center, spacing: 60) {
+                    
+                    // LEFT SIDE (carbs + buttons)
+                    VStack(spacing: 35) {
                         
-                        Text("آخر حساب لجرعة الأنسولين")
-                            .font(.system(size: 16))
-                            .foregroundColor(.gray)
-                        
-                        VStack(alignment: .center) {
-                            Text("\(viewModel.lastDose)")
-                                .font(.system(size: 62, weight: .bold))
-                                .foregroundColor(Color(red: 20/255, green: 40/255, blue: 90/255))
-                            
-                            Text("للغداء")
-                                .font(.system(size: 32, weight: .semibold))
-                                .foregroundColor(Color(red: 20/255, green: 40/255, blue: 90/255))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 28)
-                        .background(Color.white)
-                        .cornerRadius(20)
-                        .shadow(color: .black.opacity(0.06), radius: 5)
-                        
-                        // MARK: - Yellow Button
-                        Button {
-                            viewModel.calculateMeal()
-                        } label: {
-                            Text("احسب وجبتي")
-                                .font(.system(size: 22, weight: .bold))
-                                .foregroundColor(.black)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color(red: 255/255, green: 223/255, blue: 112/255))
-                                .cornerRadius(14)
-                        }
-                        
-                        // MARK: - Outline Button
-                        Button {
-                            viewModel.showPreviousMeals()
-                        } label: {
-                            Text("وجباتي السابقة")
+                        //  MAIN WHITE BOX
+                        VStack(spacing: 14) {
+                            Text("Last insulin dose calculation")
                                 .font(.system(size: 22, weight: .medium))
+                                .foregroundColor(.gray)
+                            
+                            Text("6 for Lunch")
+                                .font(.system(size: 64, weight: .heavy))
+                                .foregroundColor(Color(#colorLiteral(red: 0.12, green: 0.18, blue: 0.45, alpha: 1)))
+                        }
+                        .frame(width: 520, height: 270)
+                        .background(.white)
+                        .cornerRadius(28)
+                        .shadow(color: .black.opacity(0.07), radius: 8, y: 4)
+                        
+                        // CALCULATE MY MEAL BUTTON
+                        Button(action: {}) {
+                            Text("Calculate My Meal")
+                                .font(.system(size: 32, weight: .semibold))
                                 .foregroundColor(.black)
-                                .frame(maxWidth: .infinity)
-                                .padding()
+                                .frame(width: 520, height: 85)
+                                .background(Color(#colorLiteral(red: 0.99, green: 0.85, blue: 0.33, alpha: 1)))
+                                .cornerRadius(16)
+                        }
+                        
+                        // PREVIOUS MEALS BUTTON
+                        Button(action: {}) {
+                            Text("My Previous Meals")
+                                .font(.system(size: 30, weight: .medium))
+                                .foregroundColor(.black)
+                                .frame(width: 520, height: 85)
                                 .overlay(
-                                    RoundedRectangle(cornerRadius: 14)
-                                        .stroke(Color(red: 255/255, green: 223/255, blue: 112/255), lineWidth: 3)
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .stroke(Color(#colorLiteral(red: 0.99, green: 0.85, blue: 0.33, alpha: 1)), lineWidth: 3)
                                 )
                         }
-                        
                     }
-                    .padding(.leading, 24)
                     
-                    
-                    Spacer()
-                    
-                    // MARK: - User Image
-                    VStack(spacing: 12) {
-                        Image("AvatarGirl") // أضيفي الصورة داخل Assets
+                    // AVATAR + NAME
+                    VStack(spacing: 18) {
+                        Image("AvatarGirl")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 220, height: 260)
-                            .background(Color.white)
-                            .cornerRadius(30)
-                            .shadow(color: .black.opacity(0.06), radius: 5)
+                            .frame(width: 400, height: 500)
+                            .background(.white)
+                            .cornerRadius(36)
+                            .shadow(color: .black.opacity(0.07), radius: 8, y: 4)
                         
-                        Text(viewModel.userName)
-                            .font(.system(size: 22, weight: .medium))
+                        Text("Sarah")
+                            .font(.system(size: 30, weight: .medium))
                             .foregroundColor(.black)
                     }
-                    .padding(.trailing, 30)
                 }
+                
                 Spacer()
             }
+            .padding(.horizontal, 50)
         }
     }
 }
