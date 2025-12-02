@@ -22,10 +22,10 @@ class AccountViewModel: ObservableObject {
         // يمكن وضع أي منطق تهيئة هنا (مثل جلب البيانات الأولية)
     }
     
-    // يمكن إضافة دالة حفظ هنا إذا أردت استدعاءها لاحقاً دون زر:
-    /*
+    // دالة الحفظ التي تستدعيها من AccountPage
     func saveChanges() {
+        // ضع هنا منطق الحفظ الحقيقي (UserDefaults, Keychain, ملف, أو شبكة)
+        // مثال مؤقت:
         print("Data saved from ViewModel: \(accountData)")
     }
-    */
 }

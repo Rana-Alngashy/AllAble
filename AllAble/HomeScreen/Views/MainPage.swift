@@ -5,7 +5,6 @@
 //  Created by lamess on 10/06/1447 AH.
 //
 
-
 import SwiftUI
 
 struct MainPage: View {
@@ -13,8 +12,6 @@ struct MainPage: View {
     @StateObject private var viewModel = MainPageViewModel()
     var body: some View {
         NavigationStack {
-            
-            
             ZStack {
                 Color(#colorLiteral(red: 0.98, green: 0.96, blue: 0.90, alpha: 1))
                     .ignoresSafeArea()
@@ -32,9 +29,7 @@ struct MainPage: View {
                                 .foregroundColor(.yellow)
                         }
                         
-                        Button(action: {
-                            // go to account
-                        }) {
+                        NavigationLink(destination: AccountPage()) {
                             Image(systemName: "person.circle.fill")
                                 .font(.system(size: 50))
                                 .foregroundColor(.yellow)
@@ -108,7 +103,8 @@ struct MainPage: View {
                     Spacer()
                 }
                 .padding(.horizontal, 50)
-            }}
+            }
+        }
     }
 }
 

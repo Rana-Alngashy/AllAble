@@ -8,10 +8,15 @@
 import SwiftUI
 
 struct AccountPage: View {
+    @Environment(\.dismiss) private var dismiss
+
     @State private var name: String = ""
     @State private var age: String = ""
     @State private var guardianNumber: String = ""
     @State private var carbonValue: String = ""
+
+    // بديل تنقل داخلي بانتقال مخصص من اليسار
+    @State private var showMainOverlay = false
 
     let paleYellow = Color(red: 0.98, green: 0.96, blue: 0.90)
 
@@ -31,7 +36,7 @@ struct AccountPage: View {
                     .padding(.vertical, 10)
                     .padding(.horizontal, 10)
                     .background(Color.white)
-                    .cornerRadius(5)
+                    .cornerRadius(15)
                     .shadow(color: .gray.opacity(0.2), radius: 1, x: 0, y: 1)
                     .multilineTextAlignment(.trailing)
             }
@@ -44,46 +49,20 @@ struct AccountPage: View {
             Color.black.edgesIgnoringSafeArea(.all)
 
             VStack(spacing: 0) {
-                // شريط التنقل المعدل والمصحح
-                HStack(alignment: .top) {
-                    // 1. عنوان "Account" في اليمين (Leading في وضع RTL)
-                    Text("Account")
-                        .font(.headline)
-                        .foregroundColor(.black)
-                        .padding([.leading], 25) // مسافة من اليمين (leading)
-                    
-                    Spacer()
-
-                    // 2. الزر المثلث في اليسار (Trailing في وضع RTL)
-                    Image(systemName: "triangle.fill")
-                        .resizable()
-                        // *التصحيح:* حجم المثلث في الصورة الأصلية أصغر
-                        .frame(width: 25, height: 25)
-                        // *التصحيح:* الدوران الصحيح لجعله يشير لليسار
-                        .rotationEffect(.degrees(-90))
-                        .foregroundColor(Color(red: 1.0, green: 0.8, blue: 0.2))
-                        .padding([.trailing], 25) // مسافة من اليسار (trailing)
-                }
-                .padding(.top, 20)
-                .padding(.bottom, 30)
-                .frame(maxWidth: .infinity)
-                // ----------------------------------------------------------------
-
                 // صورة الملف الشخصي (الأفاتار)
                 Image("profile_avatar")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    // *التصحيح:* تقليل حجم الأفاتار قليلاً ليتناسب مع التباعد
-                    .frame(width: 140, height: 140)
+                    .frame(width: 200, height: 200)
                     .padding(.top, 5)
 
                 // حقول إدخال البيانات
                 GeometryReader { geometry in
                     VStack(spacing: 35) {
-                        InputField(label: "الاسم", text: $name)
-                        InputField(label: "العمر", text: $age)
-                        InputField(label: "رقم ولي الامر", text: $guardianNumber)
-                        InputField(label: "قيمة الكارب", text: $carbonValue)
+                        InputField(label: "Name", text: $name)
+                        InputField(label: "Age", text: $age)
+                        InputField(label: "Guardian Number", text: $guardianNumber)
+                        InputField(label: "Carbon Value", text: $carbonValue)
                     }
                     .frame(width: geometry.size.width * 0.75)
                     .padding(.top, 60)
@@ -91,10 +70,36 @@ struct AccountPage: View {
                 }
                 .frame(height: 350)
 
+                Button(action: {
+                    // حاول الرجوع إن كانت داخل NavigationStack
+                    dismiss()
+
+                    // ثم فعّل الانتقال المخصص كحل موحّد لضمان الحركة لليسار
+                    withAnimation(.easeInOut(duration: 0.35)) {
+                        showMainOverlay = true
+                    }
+                }) {
+                    Text("Save")
+                        .font(.headline)
+                        .padding(.horizontal, 30)
+                        .padding(.vertical, 10)
+                        .background(Color.yellow)
+                        .foregroundColor(.black)
+                        .cornerRadius(15)
+                }
+                .padding(.top, 100)
+
                 Spacer()
             }
             .background(paleYellow)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            // طبقة انتقال مخصص لعرض MainPage من اليسار
+            if showMainOverlay {
+                MainPage()
+                    .transition(.move(edge: .leading)) // دخول من جهة اليسار
+                    .zIndex(1)
+            }
         }
         .environment(\.layoutDirection, .rightToLeft)
     }
@@ -103,6 +108,8 @@ struct AccountPage: View {
 // معاينة الكود
 struct AccountPage_Previews: PreviewProvider {
     static var previews: some View {
-        AccountPage()
+        NavigationStack {
+            AccountPage()
+        }
     }
 }
