@@ -90,7 +90,7 @@ struct AccountPage: View {
                         .font(.headline)
                         .padding(.horizontal, 30)
                         .padding(.vertical, 10)
-                        .background(Color.yellow)
+                        .background(Color(#colorLiteral(red: 0.99, green: 0.85, blue: 0.33, alpha: 1)))
                         .foregroundColor(.black)
                         .cornerRadius(15)
                 }
