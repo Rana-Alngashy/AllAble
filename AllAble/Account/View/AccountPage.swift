@@ -10,10 +10,10 @@ import SwiftUI
 struct AccountPage: View {
     @Environment(\.dismiss) private var dismiss
 
-    @State private var name: String = ""
-    @State private var age: String = ""
-    @State private var guardianNumber: String = ""
-    @State private var carbonValue: String = ""
+    @AppStorage("account.name") private var name: String = ""
+    @AppStorage("account.age") private var age: String = ""
+    @AppStorage("account.guardianNumber") private var guardianNumber: String = ""
+    @AppStorage("account.carbonValue") private var carbonValue: String = ""
 
     // بديل تنقل داخلي بانتقال مخصص من اليسار
     @State private var showMainOverlay = false
@@ -49,12 +49,19 @@ struct AccountPage: View {
             Color.black.edgesIgnoringSafeArea(.all)
 
             VStack(spacing: 0) {
-                // صورة الملف الشخصي (الأفاتار)
-                Image("profile_avatar")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 200, height: 200)
-                    .padding(.top, 5)
+                // صورة الملف الشخصي (الأفاتار) مع خلفية بيضاوية بالطول
+                ZStack {
+                    Ellipse()
+                        .fill(Color.white)
+                        .frame(width: 230, height: 260) // أضيق بالعرض وأطول بالطول
+                        .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
+
+                    Image("profile_avatar")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 200, height: 200)
+                }
+                .padding(.top, 5)
 
                 // حقول إدخال البيانات
                 GeometryReader { geometry in
