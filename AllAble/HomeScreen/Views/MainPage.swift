@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct MainPage: View {
-    
+    // 1. REQUIRED INJECTION: Read the router object from the environment
+    @EnvironmentObject var router: NotificationRouter
     @StateObject private var viewModel = MainPageViewModel()
+    
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $router.navigationPath) {
             ZStack {
                 Color(#colorLiteral(red: 0.98, green: 0.96, blue: 0.90, alpha: 1))
                     .ignoresSafeArea()
@@ -69,7 +71,7 @@ struct MainPage: View {
                                     .background(Color(#colorLiteral(red: 0.99, green: 0.85, blue: 0.33, alpha: 1)))
                                     .cornerRadius(16)
                             }
-
+                            
                             
                             // PREVIOUS MEALS BUTTON
                             Button(action: {}) {
@@ -104,10 +106,19 @@ struct MainPage: View {
                 }
                 .padding(.horizontal, 50)
             }
+            .navigationDestination(isPresented: $router.shouldNavigateToOptionView) {
+                OptionView()
+            }
+            .task {
+                if router.shouldNavigateToOptionView {
+                    router.shouldNavigateToOptionView = true
+                }
+            }
         }
     }
 }
 
 #Preview {
     MainPage()
+        .environmentObject(NotificationRouter())
 }

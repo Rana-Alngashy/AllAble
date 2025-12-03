@@ -41,49 +41,52 @@
 import SwiftUI
 
 struct EditMealView: View {
-
+    @EnvironmentObject var router: NotificationRouter
     let meal: MealItem
     @StateObject var viewModel = MealContentViewModel()
-
+    
+    // 1. State variable to trigger navigation to CalculateView
+        @State private var navigateToCalculateView = false
+    
     var body: some View {
         ZStack {
             Color(#colorLiteral(red: 0.97, green: 0.96, blue: 0.92, alpha: 1))
                 .ignoresSafeArea()
-
+            
             VStack(alignment: .leading, spacing: 40) {
-
+                
                 // ————— TITLE —————
                 Text("Meal Contents")
                     .font(.system(size: 40, weight: .bold))
                     .foregroundColor(.gray.opacity(0.9))
-
+                
                 // ————— MAIN MEAL INFO —————
                 VStack(alignment: .leading, spacing: 25) {
-
+                    
                     Text("Main Meal")
                         .font(.title2).bold()
-
+                    
                     TextField("Meal name", text: $viewModel.mealName)
                         .padding()
                         .background(.white)
                         .cornerRadius(14)
-
+                    
                     TextField("Carbs", text: $viewModel.mealCarbs)
                         .keyboardType(.numberPad)
                         .padding()
                         .background(.white)
                         .cornerRadius(14)
                 }
-
+                
                 // ————— SUB ITEMS —————
                 VStack(alignment: .leading, spacing: 20) {
-
+                    
                     HStack {
                         Text("Add Sub Items")
                             .font(.title3).bold()
-
+                        
                         Spacer()
-
+                        
                         Button(action: {
                             viewModel.addSubItem()
                         }) {
@@ -92,14 +95,14 @@ struct EditMealView: View {
                                 .foregroundColor(.yellow)
                         }
                     }
-
+                    
                     ForEach($viewModel.subItems) { $item in
                         VStack(spacing: 12) {
                             TextField("Item name", text: $item.name)
                                 .padding()
                                 .background(.white)
                                 .cornerRadius(12)
-
+                            
                             TextField("Carbs", text: $item.carbs)
                                 .keyboardType(.numberPad)
                                 .padding()
@@ -107,22 +110,24 @@ struct EditMealView: View {
                                 .cornerRadius(12)
                         }
                     }
-
+                    
                 }
-
+                
                 // ————— TOTAL CARBS —————
                 Text("Total carbs: \(viewModel.totalCarbs)")
                     .font(.title2)
                     .bold()
                     .foregroundColor(.black.opacity(0.7))
-
+                
                 Spacer()
-
+                
                 // ————— BUTTON —————
                 Button(action: {
                     print("Final total carbs =", viewModel.totalCarbs)
+                    // 2. Set state to true to trigger navigation
+                    navigateToCalculateView = true
                 }) {
-                    Text("Save Meal")
+                    Text("Calculate Insulin ")
                         .font(.title3.bold())
                         .foregroundColor(.black)
                         .frame(maxWidth: .infinity)
@@ -130,10 +135,15 @@ struct EditMealView: View {
                         .background(Color(#colorLiteral(red: 0.99, green: 0.85, blue: 0.33, alpha: 1)))
                         .cornerRadius(14)
                 }
-
+                
             }
             .padding(.horizontal, 50)
             .padding(.top, 40)
+            // 3. Define the destination and pass the total carbs
+            .navigationDestination(isPresented: $navigateToCalculateView) {
+                // NOTE: CalculateView must be defined and receive totalCarbs
+                CalculateView(totalCarbs: viewModel.totalCarbs)
+            }
         }
     }
 }
