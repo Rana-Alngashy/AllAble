@@ -61,7 +61,7 @@ struct ReminderView: View {
         }
         .padding(.horizontal, 30)
         .background(customBackground.ignoresSafeArea())
-        
+        .navigationTitle("Reminder")
     }
     
     // MARK: - Notification Logic

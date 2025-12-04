@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct MainPage: View {
-    // 1. Inject the AppFlowViewModel to access the profile data
-    @EnvironmentObject var appFlow: AppFlowViewModel
+    // 1. REQUIRED INJECTION: Read the router object from the environment
     @EnvironmentObject var router: NotificationRouter
     @StateObject private var viewModel = MainPageViewModel()
     
@@ -87,38 +86,37 @@ struct MainPage: View {
                             }
                         }
                         
+                        // AVATAR + NAME
                         VStack(spacing: 18) {
-                                
-                                // 2. Use the chosen avatar from AppFlow
-                                Image(appFlow.childProfile.avatarName)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 400, height: 500)
-                                    .background(.white)
-                                    .cornerRadius(36)
-                                    .shadow(color: .black.opacity(0.07), radius: 8, y: 4)
-                                
-                                // 3. Use the child's name from AppFlow
-                                Text(appFlow.childProfile.name.isEmpty ? "Sarah" : appFlow.childProfile.name)
-                                    .font(.system(size: 30, weight: .medium))
-                                    .foregroundColor(.black)
-                            }
+                            Image("AvatarGirl")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 400, height: 500)
+                                .background(.white)
+                                .cornerRadius(36)
+                                .shadow(color: .black.opacity(0.07), radius: 8, y: 4)
+                            
+                            Text("Sarah")
+                                .font(.system(size: 30, weight: .medium))
+                                .foregroundColor(.black)
                         }
-                        Spacer()
                     }
-                    .padding(.horizontal, 50)
+                    
+                    Spacer()
                 }
-                .navigationDestination(isPresented: $router.shouldNavigateToOptionView) {
-                    OptionView()
-                }
-                .task {
-                    if router.shouldNavigateToOptionView {
-                        router.shouldNavigateToOptionView = true
-                    }
+                .padding(.horizontal, 50)
+            }
+            .navigationDestination(isPresented: $router.shouldNavigateToOptionView) {
+                OptionView()
+            }
+            .task {
+                if router.shouldNavigateToOptionView {
+                    router.shouldNavigateToOptionView = true
                 }
             }
         }
     }
+}
 
 #Preview {
     MainPage()

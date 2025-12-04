@@ -4,18 +4,12 @@
 //
 //  Created by Rana Alngashy on 12/06/1447 AH.
 //
-//
-//  TimerViewModel.swift
-//  AllAble
-//
-//  Created by Rana Alngashy on 12/06/1447 AH.
-//
-
+// TimerViewModel.swift
 import SwiftUI
 import Combine
 
 class TimerViewModel: ObservableObject {
-    @Published var timeRemaining: Int = 5 // Increased to 5 seconds for a better test
+    @Published var timeRemaining: Int = 1 // Set to 1 second for fast testing
     @Published var isActive = false
     @Published var isFinished: Bool = false
     
@@ -24,9 +18,8 @@ class TimerViewModel: ObservableObject {
     func start() {
         if isActive { return }
         
-        // Reset if finished previously
         if timeRemaining <= 0 {
-            timeRemaining = 5
+            timeRemaining = 1
             isFinished = false
         }
         
@@ -34,7 +27,6 @@ class TimerViewModel: ObservableObject {
         
         timer = Timer.publish(every: 1, on: .main, in: .common)
             .autoconnect()
-            .receive(on: RunLoop.main) // 🛑 Ensure updates happen on the Main Thread
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 
@@ -42,7 +34,7 @@ class TimerViewModel: ObservableObject {
                     self.timeRemaining -= 1
                 } else {
                     self.stop()
-                    self.isFinished = true // This triggers the navigation
+                    self.isFinished = true
                 }
             }
     }

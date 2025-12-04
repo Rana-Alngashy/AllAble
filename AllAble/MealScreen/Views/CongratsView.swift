@@ -7,35 +7,24 @@
 
 // CongratsView.swift
 // CongratsView.swift
-//
-//  CongratsView.swift
-//  AllAble
-//
-//  Created by Rana Alngashy on 12/06/1447 AH.
-//
-
 import SwiftUI
 
 struct CongratsView: View {
     
-    // MARK: - Environment
-    // 1. Get the AppFlow to access the chosen avatar
-    @EnvironmentObject var appFlow: AppFlowViewModel
-    @EnvironmentObject var router: NotificationRouter
-    
     // MARK: - Navigation State
+    // Required to trigger the hidden NavigationLink push to MainPage
     @State private var navigateToMainPage = false
     
     // MARK: - Properties
-    // Removed 'let avatarType: String' because we fetch it from appFlow now
+    let avatarType: String
     
     // Define the custom colors using standard syntax
     let customYellow = Color(red: 0.99, green: 0.85, blue: 0.33)
     let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
     
     var avatarImageName: String {
-        // 2. Return the avatar name saved in the profile ("AvatarGirl" or "AvatarBoy")
-        return appFlow.childProfile.avatarName
+        // NOTE: These images must exist in your project's assets
+        return avatarType == "male" ? "male_avatar_achievement" : "AvatarGirl"
     }
     
     var body: some View {
@@ -44,11 +33,11 @@ struct CongratsView: View {
             // ————— HEADER —————
             Text("Fantastic!")
                 .font(.system(size: 60, weight: .heavy))
-                .foregroundColor(customYellow)
+                .foregroundColor(customYellow) // Using custom yellow
                 .shadow(radius: 5)
                 .padding(.top, 80)
             
-            Text("Dose complete! You managed your insulin like a pro.")
+            Text("Dose complete! You managed your insulin like a pro.") // Final chosen message
                 .font(.title2)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.black.opacity(0.8))
@@ -66,37 +55,34 @@ struct CongratsView: View {
             
             Spacer()
             
-            // 🛑 NAVIGATION 🛑
-            // Pushes to MainPage after delay.
-            // We pass 'appFlow' so MainPage knows which avatar to show too.
-            NavigationLink(
-                destination: MainPage()
-                    .environmentObject(router)
-                    .environmentObject(appFlow),
-                isActive: $navigateToMainPage
-            ) {
+            
+            
+            // 🛑 CRITICAL FIX: Reverting to the working NavigationLink structure
+            // This link is pushed onto the stack after 2 seconds.
+            NavigationLink(destination: MainPage().environmentObject(NotificationRouter()), isActive: $navigateToMainPage) {
                 EmptyView()
             }
             .hidden()
 
+            // REMOVED the "Done" button as requested
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(customBackground.ignoresSafeArea())
         .navigationBarHidden(true)
         
-        // 2-second auto-navigation logic
+        // 2-second auto-navigation logic (Working Method)
         .onAppear {
             Task {
+                // Wait for 2 seconds (2,000,000,000 nanoseconds)
                 try await Task.sleep(nanoseconds: 2_000_000_000)
+                
+                // Trigger the hidden NavigationLink push
                 navigateToMainPage = true
             }
         }
     }
 }
-
 #Preview {
-    // Inject mock data for the preview to work
-    CongratsView()
+    CongratsView(avatarType: "female")
         .environmentObject(NotificationRouter())
-        .environmentObject(AppFlowViewModel())
 }
