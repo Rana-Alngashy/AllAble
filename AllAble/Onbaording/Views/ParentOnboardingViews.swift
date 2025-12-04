@@ -42,11 +42,13 @@ struct ParentLoginView: View {
             VStack(spacing: 40) {
                 Text("Parent Verification")
                     .font(.largeTitle.bold())
-                    .foregroundColor(.gray)
+                    .foregroundColor(.black)
                 
                 VStack(spacing: 20) {
                     Text("Please enter your National ID to verify via Nafath")
                         .font(.title3)
+                        .foregroundColor(.gray)
+
                     
                     TextField("National ID", text: $viewModel.nationalID)
                         .keyboardType(.numberPad)
@@ -56,6 +58,8 @@ struct ParentLoginView: View {
                         .font(.title2)
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: 400)
+                        .foregroundColor(.black)
+
                 }
                 
                 PrimaryButton(title: "Verify with Nafath", isLoading: viewModel.isLoading) {
@@ -90,12 +94,16 @@ struct AcknowledgmentView: View {
                 
                 Text("Verification Successful")
                     .font(.largeTitle.bold())
+                    .foregroundColor(.black)
+
                 
                 Text("I hereby acknowledge that I am the legal guardian of the child and authorize the use of AllAble to assist in managing their insulin doses.")
                     .font(.title2)
                     .multilineTextAlignment(.center)
                     .padding()
                     .frame(maxWidth: 600)
+                    .foregroundColor(.gray)
+
                 
                 PrimaryButton(title: "I Agree & Continue") {
                     path.append("ChildInfo")
@@ -117,16 +125,22 @@ struct ChildInfoView: View {
             VStack(spacing: 40) {
                 Text("Child Profile")
                     .font(.largeTitle.bold())
+                    .foregroundColor(.black)
+
                 
                 VStack(spacing: 20) {
                     TextField("Child's Name", text: $viewModel.childName)
                         .padding()
                         .background(.white).cornerRadius(12)
+                        .foregroundColor(.black)
+
                     
                     TextField("Child's Age", text: $viewModel.childAge)
                         .keyboardType(.numberPad)
                         .padding()
                         .background(.white).cornerRadius(12)
+                        .foregroundColor(.black)
+
                 }
                 .frame(maxWidth: 450)
                 .font(.title2)
@@ -153,6 +167,8 @@ struct CarbRatioVerificationView: View {
             VStack(spacing: 40) {
                 Text("Insulin-to-Carb Ratio (ICR)")
                     .font(.largeTitle.bold())
+                    .foregroundColor(.black)
+
                 
                 HStack(spacing: 30) {
                     // Option A: Sehaty
@@ -197,6 +213,8 @@ struct CarbRatioVerificationView: View {
                             .background(.white)
                             .cornerRadius(12)
                             .frame(width: 200)
+                            .foregroundColor(.gray)
+
                         
                         Button(action: {
                             Task { await viewModel.uploadDocument() }
@@ -266,6 +284,8 @@ struct AvatarSelectionView: View {
             VStack(spacing: 40) {
                 Text("Pick Your Hero!")
                     .font(.largeTitle.bold())
+                    .foregroundColor(.black)
+
                 
                 HStack(spacing: 60) { // Increased spacing slightly for better separation
                     ForEach(avatars, id: \.self) { avatar in
