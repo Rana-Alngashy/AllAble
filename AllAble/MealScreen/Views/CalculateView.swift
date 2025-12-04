@@ -4,48 +4,63 @@
 //
 //  Created by Rana Alngashy on 12/06/1447 AH.
 //
+//
+//  CalculateView.swift
+//  AllAble
+//
+//  Created by Rana Alngashy on 12/06/1447 AH.
+//
+//
+//  CalculateView.swift
+//  AllAble
+//
+//  Created by Rana Alngashy on 12/06/1447 AH.
+//
 import SwiftUI
 
 struct CalculateView: View {
     @EnvironmentObject var router: NotificationRouter
     
-    // MARK: - Environment
-    // Removed @Environment(\.dismiss) var dismiss as it's no longer needed for the back button
+    // 1. Inject AppFlow to get the Carb Ratio
+    @EnvironmentObject var appFlow: AppFlowViewModel
     
-    // MARK: - Properties
     let totalCarbs: Int
-    let carbConstant: Double = 15.0
-    
     @State private var navigateToOptionView = false
     
-    // Define the custom colors using fixed syntax
     let customYellow = Color(red: 0.99, green: 0.85, blue: 0.33)
     let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
     let circleMaxSize: CGFloat = 300
     
     // MARK: - Calculated Dose
     var insulinDose: Double {
-        guard totalCarbs > 0 && carbConstant > 0 else { return 0.0 }
-        let calculatedValue = Double(totalCarbs) / carbConstant
-        let roundedToNearestHalf = round(calculatedValue * 2.0) / 2.0
-        return roundedToNearestHalf
+        // Use the real ratio from the profile
+        // If the ratio is 0 (error), default to 15 to avoid division by zero
+        let ratio = appFlow.childProfile.carbRatio > 0 ? appFlow.childProfile.carbRatio : 15.0
+        
+        guard totalCarbs > 0 else { return 0.0 }
+        
+        let calculatedValue = Double(totalCarbs) / ratio
+        
+        // UPDATED LOGIC: Round to the nearest whole number
+        // 3.4 rounds to 3.0
+        // 3.5 rounds to 4.0
+        return calculatedValue.rounded()
     }
 
-    // MARK: - Body
     var body: some View {
-        
         GeometryReader { geometry in
-            
-    
-            // Main Content now starts here inside the NavigationStack context
             VStack {
-                
                 VStack(spacing: 40) {
                     
                     Text("Your Insulin Dose")
                         .font(.system(size: 34, weight: .bold))
                         .padding(.top, 40)
                     
+                    // Optional: Debugging text
+                    // Text("Carbs: \(totalCarbs) / Ratio: \(Int(appFlow.childProfile.carbRatio))")
+                    //    .font(.caption)
+                    //    .foregroundColor(.gray)
+
                     Spacer()
                     
                     // ————— CIRCLE DISPLAY (Insulin Value) —————
@@ -65,7 +80,8 @@ struct CalculateView: View {
                                    height: min(geometry.size.width * 0.5, circleMaxSize))
                             .shadow(radius: 5)
 
-                        Text(insulinDose.formatted(.number.precision(.fractionLength(insulinDose.truncatingRemainder(dividingBy: 1) == 0 ? 0 : 1))))
+                        // Format to show no decimal places since we are rounding to whole numbers
+                        Text(String(format: "%.0f", insulinDose))
                             .font(.system(size: 100, weight: .heavy))
                             .foregroundColor(.white)
                     }
@@ -99,17 +115,9 @@ struct CalculateView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(customBackground.ignoresSafeArea())
             
-            
             .navigationDestination(isPresented: $navigateToOptionView) {
                 OptionView()
             }
-            // The default back button will now appear automatically.
-            
-            
-            
         }
     }
-}
-#Preview {
-    CalculateView(totalCarbs: 90)
 }

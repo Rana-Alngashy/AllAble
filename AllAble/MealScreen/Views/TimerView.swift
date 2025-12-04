@@ -5,31 +5,34 @@
 //  Created by Rana Alngashy on 12/06/1447 AH.
 //
 
-// TimerView.swift
+//
+//  TimerView.swift
+//  AllAble
+//
+//  Created by Rana Alngashy on 12/06/1447 AH.
+//
+
 import SwiftUI
 
 struct TimerView: View {
     
     @StateObject var viewModel = TimerViewModel()
+    
+    // 1. Inject AppFlow to pass the correct avatar to CongratsView
+    @EnvironmentObject var appFlow: AppFlowViewModel
+    @EnvironmentObject var router: NotificationRouter
+    
     @State private var navigateToCongratsView = false
     
     let timerCircleColor = Color(red: 0.60, green: 0.82, blue: 0.80)
     let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
-    
-    // Define sizes
     let circleSize: CGFloat = 250
-    // Increased avatar size significantly for the large iPad interface
-    let avatarSize: CGFloat = 450
 
     var body: some View {
         GeometryReader { geometry in
-            
-            // 🛑 ZStack to overlay the avatar on the right side of the main content 🛑
             ZStack(alignment: .center) {
                 
-                // ————— MAIN CONTENT (Centered Timer) —————
                 VStack {
-                    
                     Text("Insulin Timer")
                         .font(.largeTitle)
                         .bold()
@@ -37,7 +40,7 @@ struct TimerView: View {
                     
                     Spacer()
                     
-                    // ————— TIMER CIRCLE DISPLAY (Perfectly Centered) —————
+                    // ————— TIMER CIRCLE —————
                     ZStack {
                         Circle()
                             .stroke(timerCircleColor, lineWidth: 10)
@@ -50,10 +53,9 @@ struct TimerView: View {
                             .monospacedDigit()
                     }
                     
-                    // Empty space that pushes the timer up, allowing the avatar to fit below the title
                     Spacer()
                     
-                    // ————— START/FINISH BUTTON —————
+                    // ————— START BUTTON —————
                     Button(action: {
                         if !viewModel.isActive && viewModel.timeRemaining > 0 {
                             viewModel.start()
@@ -79,34 +81,29 @@ struct TimerView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(customBackground.ignoresSafeArea())
                 
-                // 🛑 AVATAR OVERLAY (Moved to the Right) 🛑
-                // We align the avatar to the trailing edge and push it down
-                // to appear next to the circle, filling the space.
-               // Image("AvatarGirl2")
-                   // .resizable()
-                  //  .scaledToFit()
-                  //  .frame(width: avatarSize, height: avatarSize)
-                    // Anchor to the center of the right half of the screen
-                   // .offset(x: geometry.size.width / 4, y: 50)
-                   // .allowsHitTesting(false) // Prevents the image from blocking button taps
-                
-            } // End ZStack
-            
-        } // End GeometryReader
-
+            }
+        }
         .onDisappear {
             viewModel.stop()
         }
-        .onReceive(viewModel.$isFinished) { finished in
+        // 🛑 FIXED: Use onChange instead of onReceive for reliable state observation
+        .onChange(of: viewModel.isFinished) { finished in
             if finished {
+                print("Timer finished! Navigating to CongratsView...")
                 navigateToCongratsView = true
             }
         }
-        .navigationDestination(isPresented: $navigateToCongratsView) {
-            CongratsView(avatarType: "female")
-        }
+        // 🛑 FIXED: Remove the 'avatarType' parameter.
+                // CongratsView now reads the avatar directly from the 'appFlow' environment object.
+                .navigationDestination(isPresented: $navigateToCongratsView) {
+                    CongratsView()
+                        .environmentObject(appFlow)
+                        .environmentObject(router)
+                }
     }
 }
+
 #Preview {
-   TimerView()
+    TimerView()
+        .environmentObject(AppFlowViewModel())
 }

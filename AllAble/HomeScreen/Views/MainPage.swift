@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct MainPage: View {
-    // 1. REQUIRED INJECTION: Read the router object from the environment
+    // 1. Inject the AppFlowViewModel to access the profile data
+    @EnvironmentObject var appFlow: AppFlowViewModel
     @EnvironmentObject var router: NotificationRouter
     @StateObject private var viewModel = MainPageViewModel()
     
@@ -86,37 +87,38 @@ struct MainPage: View {
                             }
                         }
                         
-                        // AVATAR + NAME
                         VStack(spacing: 18) {
-                            Image("AvatarGirl")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 400, height: 500)
-                                .background(.white)
-                                .cornerRadius(36)
-                                .shadow(color: .black.opacity(0.07), radius: 8, y: 4)
-                            
-                            Text("Sarah")
-                                .font(.system(size: 30, weight: .medium))
-                                .foregroundColor(.black)
+                                
+                                // 2. Use the chosen avatar from AppFlow
+                                Image(appFlow.childProfile.avatarName)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 400, height: 500)
+                                    .background(.white)
+                                    .cornerRadius(36)
+                                    .shadow(color: .black.opacity(0.07), radius: 8, y: 4)
+                                
+                                // 3. Use the child's name from AppFlow
+                                Text(appFlow.childProfile.name.isEmpty ? "Sarah" : appFlow.childProfile.name)
+                                    .font(.system(size: 30, weight: .medium))
+                                    .foregroundColor(.black)
+                            }
                         }
+                        Spacer()
                     }
-                    
-                    Spacer()
+                    .padding(.horizontal, 50)
                 }
-                .padding(.horizontal, 50)
-            }
-            .navigationDestination(isPresented: $router.shouldNavigateToOptionView) {
-                OptionView()
-            }
-            .task {
-                if router.shouldNavigateToOptionView {
-                    router.shouldNavigateToOptionView = true
+                .navigationDestination(isPresented: $router.shouldNavigateToOptionView) {
+                    OptionView()
+                }
+                .task {
+                    if router.shouldNavigateToOptionView {
+                        router.shouldNavigateToOptionView = true
+                    }
                 }
             }
         }
     }
-}
 
 #Preview {
     MainPage()
