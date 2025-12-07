@@ -9,72 +9,51 @@ import SwiftUI
 struct CalculateView: View {
     @EnvironmentObject var router: NotificationRouter
     
-    // 1. Fetch the stored Carb Ratio directly from UserDefaults (set in AccountPage)
-    // If empty or invalid, it defaults to "15"
+    // 1. Connect to the History Store
+    @EnvironmentObject var historyStore: HistoryStore
+    
     @AppStorage("account.carbonValue") private var storedCarbRatio: String = "15"
     
     // MARK: - Properties
     let totalCarbs: Int
+    // 2. Add properties to receive the name and type
+    let mealName: String
+    let mealType: String
     
     @State private var navigateToOptionView = false
     
-    // Define the custom colors
-    let customYellow = Color(red: 0.99, green: 0.85, blue: 0.33)
-    let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
     let circleMaxSize: CGFloat = 300
+    let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
     
-    // Helper to convert the stored string to a Double safely
     var carbRatio: Double {
         return Double(storedCarbRatio) ?? 15.0
     }
     
-    // MARK: - Calculated Dose Logic
     var insulinDose: Double {
         guard totalCarbs > 0 && carbRatio > 0 else { return 0.0 }
-        
-        // 1. Calculate raw value
         let calculatedValue = Double(totalCarbs) / carbRatio
-        
-        // 2. Standard Rounding Rule:
-        // round() rounds to the nearest integer (3.4 -> 3.0, 3.5 -> 4.0)
         return round(calculatedValue)
     }
 
-    // MARK: - Body
     var body: some View {
-        
         GeometryReader { geometry in
-            
             VStack {
-                
                 VStack(spacing: 30) {
                     
                     Text("Your Insulin Dose")
                         .font(.system(size: 34, weight: .bold))
                         .padding(.top, 40)
                     
-                    // ————— DETAILS BAR (Input & Output) —————
-                    // Displays the Total Carbs and the Ratio used
+                    // ————— DETAILS BAR —————
                     HStack(spacing: 20) {
-                        // Card 1: Total Carbs
-                        InfoCard(
-                            title: "Total Carbs",
-                            value: "\(totalCarbs)g",
-                            icon: "fork.knife"
-                        )
-                        
-                        // Card 2: Carb Ratio
-                        InfoCard(
-                            title: "Carb Ratio",
-                            value: "1 : \(Int(carbRatio))",
-                            icon: "drop.fill"
-                        )
+                        InfoCard(title: "Total Carbs", value: "\(totalCarbs)g", icon: "fork.knife")
+                        InfoCard(title: "Carb Ratio", value: "1 : \(Int(carbRatio))", icon: "drop.fill")
                     }
                     .padding(.horizontal, 40)
                     
                     Spacer()
                     
-                    // ————— CIRCLE DISPLAY (Output) —————
+                    // ————— CIRCLE DISPLAY —————
                     ZStack {
                         Circle()
                             .fill(
@@ -91,7 +70,6 @@ struct CalculateView: View {
                                    height: min(geometry.size.width * 0.5, circleMaxSize))
                             .shadow(radius: 5)
 
-                        // Format as whole number (precision 0)
                         Text(String(format: "%.0f", insulinDose))
                             .font(.system(size: 100, weight: .heavy))
                             .foregroundColor(.white)
@@ -99,8 +77,18 @@ struct CalculateView: View {
                     
                     Spacer()
                     
-                    // ————— CONTINUE BUTTON —————
+                    // ————— CONTINUE BUTTON (SAVE ACTION) —————
                     Button(action: {
+                        // 3. Save the meal to history before continuing!
+                        let newEntry = HistoryEntry(
+                            mealTypeTitle: mealType,
+                            mealName: mealName.isEmpty ? "My Meal" : mealName, // Default name if empty
+                            totalCarbs: Double(totalCarbs),
+                            insulinDose: insulinDose
+                        )
+                        historyStore.addEntry(newEntry)
+                        
+                        // Navigate
                         navigateToOptionView = true
                     }) {
                         Text("Continue")
@@ -121,11 +109,9 @@ struct CalculateView: View {
 
                 }
                 .frame(maxWidth: 600)
-                
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(customBackground.ignoresSafeArea())
-            
             .navigationDestination(isPresented: $navigateToOptionView) {
                 OptionView()
             }
@@ -133,7 +119,7 @@ struct CalculateView: View {
     }
 }
 
-// MARK: - Helper View for Details Bar
+// Helper view
 struct InfoCard: View {
     let title: String
     let value: String
@@ -143,16 +129,11 @@ struct InfoCard: View {
         HStack {
             Image(systemName: icon)
                 .font(.title2)
-                .foregroundColor(Color(red: 0.99, green: 0.85, blue: 0.33)) // Custom Yellow
+                .foregroundColor(Color(red: 0.99, green: 0.85, blue: 0.33))
             
             VStack(alignment: .leading) {
-                Text(title)
-                    .font(.caption)
-                    .foregroundColor(.gray)
-                Text(value)
-                    .font(.title3)
-                    .bold()
-                    .foregroundColor(.black)
+                Text(title).font(.caption).foregroundColor(.gray)
+                Text(value).font(.title3).bold().foregroundColor(.black)
             }
             Spacer()
         }
@@ -161,9 +142,4 @@ struct InfoCard: View {
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 3, x: 0, y: 2)
     }
-}
-
-#Preview {
-    CalculateView(totalCarbs: 52) // Example: 52 / 15 = 3.46 -> Rounds to 3
-        .environmentObject(NotificationRouter())
 }

@@ -141,8 +141,11 @@ struct EditMealView: View {
             .padding(.top, 40)
             // 3. Define the destination and pass the total carbs
             .navigationDestination(isPresented: $navigateToCalculateView) {
-                // NOTE: CalculateView must be defined and receive totalCarbs
-                CalculateView(totalCarbs: viewModel.totalCarbs)
+                CalculateView(
+                    totalCarbs: viewModel.totalCarbs,
+                    mealName: viewModel.mealName,
+                    mealType: meal.title // Passes "Lunch", "Breakfast", etc.
+                )
             }
         }
     }

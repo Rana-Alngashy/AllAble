@@ -74,16 +74,19 @@ struct MainPage: View {
                             
                             
                             // PREVIOUS MEALS BUTTON
-                            Button(action: {}) {
+                        
+                            NavigationLink(destination: HistoryView()) {
                                 Text("My Previous Meals")
                                     .font(.system(size: 30, weight: .medium))
                                     .foregroundColor(.black)
                                     .frame(width: 520, height: 85)
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 16)
+                                            // Note: I fixed the color syntax to be standard SwiftUI or stick to your literal
                                             .stroke(Color(#colorLiteral(red: 0.99, green: 0.85, blue: 0.33, alpha: 1)), lineWidth: 3)
                                     )
                             }
+                            
                         }
                         
                         // AVATAR + NAME
