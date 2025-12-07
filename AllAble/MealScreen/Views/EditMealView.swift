@@ -38,6 +38,21 @@
 //    )
 //}
 
+
+
+
+
+
+
+
+
+
+//
+//  EditMealView.swift
+//  AllAble
+//
+//  Created by lamess on 10/06/1447 AH.
+//
 import SwiftUI
 
 struct EditMealView: View {
@@ -46,7 +61,7 @@ struct EditMealView: View {
     @StateObject var viewModel = MealContentViewModel()
     
     // 1. State variable to trigger navigation to CalculateView
-        @State private var navigateToCalculateView = false
+    @State private var navigateToCalculateView = false
     
     var body: some View {
         ZStack {
@@ -139,12 +154,12 @@ struct EditMealView: View {
             }
             .padding(.horizontal, 50)
             .padding(.top, 40)
-            // 3. Define the destination and pass the total carbs
+            // 🔥 إصلاح خطأ الوسائط: تمرير mealName و mealType
             .navigationDestination(isPresented: $navigateToCalculateView) {
                 CalculateView(
                     totalCarbs: viewModel.totalCarbs,
-                    mealName: viewModel.mealName,
-                    mealType: meal.title // Passes "Lunch", "Breakfast", etc.
+                    mealName: viewModel.mealName.isEmpty ? meal.title : viewModel.mealName, // استخدم اسم الوجبة من ViewModel إذا كان موجوداً
+                    mealType: meal.title // يمرر "Lunch", "Breakfast", etc.
                 )
             }
         }
@@ -160,4 +175,3 @@ struct EditMealView: View {
         )
     )
 }
-

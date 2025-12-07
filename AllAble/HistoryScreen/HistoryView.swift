@@ -1,13 +1,18 @@
+//
+//  HistoryView.swift
+//  AllAble
+//
+//  Created by Wteen Alghamdy on 16/06/1447 AH.
+//
+
 import SwiftUI
 
 struct HistoryView: View {
-    // استخدام HistoryStore لقراءة السجل فقط
+    // 🔥 استخدام HistoryStore لقراءة السجل فقط
     @EnvironmentObject var historyStore: HistoryStore
     
     // ألوان الخلفية العامة
-    // جعل الخلفية مطابقة لصفحة MainPage: (0.98, 0.96, 0.90)
     private let pageBackground = Color(red: 0.98, green: 0.96, blue: 0.90)
-    private let capsuleBackground = Color.white.opacity(0.95)
     
     var body: some View {
         ZStack {
@@ -15,18 +20,9 @@ struct HistoryView: View {
             
             VStack(alignment: .trailing, spacing: 24) {
                 
-                // شريط علوي: سهم يسار + كبسولة أيقونات يمين
+                // شريط علوي (تم تبسيطه لغرض الدمج)
                 HStack {
-                    // سهم رجوع يسار (شكل ديكوري، بإمكانك تحويله لزر رجوع فعلي)
-                    
-                    
-                  
-                    
-                    // كبسولة أيقونات يمين
-                  
-                   
-                    
-                    
+                    Spacer()
                 }
                 .padding(.top, 10)
                 
@@ -36,7 +32,7 @@ struct HistoryView: View {
                     .foregroundColor(.gray.opacity(0.9))
                     .padding(.trailing, 40)
                 
-                // عرض التاريخ الحقيقي من HistoryStore (بدون بيانات افتراضية)
+                // عرض التاريخ الحقيقي من HistoryStore
                 if historyStore.entries.isEmpty {
                     Spacer()
                     VStack(spacing: 12) {
@@ -50,13 +46,13 @@ struct HistoryView: View {
                 } else {
                     ScrollView {
                         VStack(spacing: 28) {
-                            ForEach(historyStore.entries) { entry in
+                            // قراءة البيانات من المخزن
+                            ForEach(historyStore.entries.reversed()) { entry in
                                 MealLargeCard(
                                     type: localizedType(entry.mealTypeTitle),
                                     name: entry.mealName,
-                                    carbsText: "\(entry.totalCarbs)g",
+                                    carbsText: "\(String(format: "%.0f", entry.totalCarbs))g",
                                     insulinText: formatDose(entry.insulinDose),
-                                    // إجبار استخدام الصور الافتراضية حسب نوع الوجبة
                                     imageName: fallbackImageName(for: entry.mealTypeTitle),
                                     background: backgroundColor(for: entry.mealTypeTitle)
                                 )
@@ -71,6 +67,8 @@ struct HistoryView: View {
             }
         }
         .environment(\.layoutDirection, .rightToLeft)
+        .navigationTitle("") // إخفاء عنوان الصفحة
+        .navigationBarTitleDisplayMode(.inline)
     }
     
     // MARK: - Helpers
@@ -87,10 +85,10 @@ struct HistoryView: View {
     
     private func fallbackImageName(for type: String) -> String {
         switch type.lowercased() {
-        case "breakfast", "فطور": return "egg"        // الفطور → egg
-        case "lunch", "غداء": return "lunch"          // الغداء → lunch
-        case "dinner", "عشاء": return "salad"         // العشاء → salad
-        case "snacks", "سناكس": return "snacksImg"    // السناكس → snacksImg
+        case "breakfast", "فطور": return "egg"
+        case "lunch", "غداء": return "lunch"
+        case "dinner", "عشاء": return "salad"
+        case "snacks", "سناكس": return "snacksImg"
         default: return "egg"
         }
     }
@@ -104,7 +102,7 @@ struct HistoryView: View {
         case "dinner", "عشاء":
             return Color(red: 0.90, green: 0.98, blue: 0.95) // أزرق/أخضر فاتح
         case "snacks", "سناكس":
-            return Color(#colorLiteral(red: 1.00, green: 0.90, blue: 0.95, alpha: 1)) // وردي مائل للبنفسجي (مطابق لـ AddMealView)
+            return Color(#colorLiteral(red: 1.00, green: 0.90, blue: 0.95, alpha: 1))
         default:
             return Color.white.opacity(0.9)
         }
@@ -119,7 +117,7 @@ struct HistoryView: View {
     }
 }
 
-// بطاقة كبيرة مطابقة للتصميم
+// ... (Helper struct MealLargeCard) ...
 private struct MealLargeCard: View {
     let type: String
     let name: String
@@ -169,13 +167,5 @@ private struct MealLargeCard: View {
                 Spacer(minLength: 60)
             }
         }
-    }
-}
-
-struct HistoryView_Previews: PreviewProvider {
-    static var previews: some View {
-        HistoryView()
-            .environmentObject(HistoryStore()) // للمعاينة
-            .previewLayout(.fixed(width: 1366, height: 1024))
     }
 }
