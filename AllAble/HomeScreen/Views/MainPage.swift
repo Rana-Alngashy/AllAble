@@ -3,6 +3,8 @@ import SwiftUI
 struct MainPage: View {
     
     @EnvironmentObject var router: NotificationRouter
+    @EnvironmentObject var historyStore: HistoryStore  // ✅ قراءة السجل من البيئة
+    
     @AppStorage("selectedAvatarImageName") private var selectedAvatarImageName: String = "AvatarGirl"
     @AppStorage("account.name") private var userName: String = "Sarah"
     
@@ -11,6 +13,24 @@ struct MainPage: View {
     
     private var isCompact: Bool {
         hSize == .compact   // iPhone
+    }
+    
+    // ✅ نص آخر جرعة فعلية من السجل
+    private var lastDoseDisplayText: String {
+        if let last = historyStore.entries.last {
+            // مثال: "6 for Lunch"
+            let doseText: String
+            if last.insulinDose.rounded() == last.insulinDose {
+                doseText = String(format: "%.0f", last.insulinDose)
+            } else {
+                doseText = String(format: "%.1f", last.insulinDose)
+            }
+            // استخدم اسم الوجبة أو نوعها
+            let mealText = last.mealName.isEmpty ? last.mealTypeTitle : last.mealName
+            return "\(doseText) for \(mealText)"
+        } else {
+            return "No insulin dose yet"
+        }
     }
     
     var body: some View {
@@ -76,8 +96,9 @@ struct MainPage: View {
                 .font(.headline)                      // ✅ Dynamic Type
                 .foregroundColor(.gray)
             
-            Text("\(viewModel.lastDose) for \(viewModel.userName)")
-                .font(isCompact ? .largeTitle : .system(.largeTitle, weight: .heavy)) // ✅
+            // ✅ عرض آخر جرعة فعلية من HistoryStore
+            Text(lastDoseDisplayText)
+                .font(isCompact ? .largeTitle : .system(.largeTitle, weight: .heavy))
                 .foregroundColor(Color(#colorLiteral(red: 0.12, green: 0.18, blue: 0.45, alpha: 1)))
                 .minimumScaleFactor(0.6)
                 .lineLimit(1)
@@ -139,4 +160,5 @@ struct MainPage: View {
 #Preview {
     MainPage()
         .environmentObject(NotificationRouter())
+        .environmentObject(HistoryStore()) // ✅ للمعاينة
 }
