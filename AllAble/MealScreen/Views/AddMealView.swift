@@ -89,8 +89,7 @@ struct AddMealView: View {
                 VStack(alignment: .leading, spacing: isCompact ? 50 : 50) {
 
                     // ————— PAGE TITLE ——————
-                    Text("Calculate My Meal")
-                        .font(.system(size: isCompact ? 35 : 42, weight: .bold))
+                    Text("Title.CalculateMeal")                        .font(.system(size: isCompact ? 35 : 42, weight: .bold))
                         .foregroundColor(.gray.opacity(0.9))
                         .padding(.horizontal)
 

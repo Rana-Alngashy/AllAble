@@ -23,7 +23,7 @@ struct ReminderView: View {
     var body: some View {
         VStack(spacing: isCompact ? 24 : 30) {
 Spacer()
-            Text("Set Insulin Reminder")
+            Text("Title.SetReminder")
                 .font(isCompact ? .title2 : .largeTitle)
                 .bold()
                 .padding(.top, isCompact ? 20 : 40)
@@ -32,7 +32,7 @@ Spacer()
 
             // ————— TIME PICKER —————
             VStack(alignment: .leading, spacing: 12) {
-                Text("Select Reminder Time")
+                Text("Label.SelectTime")
                     .font(isCompact ? .subheadline : .headline)
                     .padding(.leading)
                     
@@ -54,7 +54,7 @@ Spacer()
             Button(action: {
                 scheduleNotification()
             }) {
-                Text("Save and Finish")
+                Text("Button.SaveFinish")
                     .font(isCompact ? .title3 : .title3)
                     .foregroundColor(.black)
                     .frame(maxWidth: .infinity)
@@ -86,8 +86,8 @@ Spacer()
         let center = UNUserNotificationCenter.current()
         let content = UNMutableNotificationContent()
         
-        content.title = "Insulin Update"
-        content.body = "Update your status."
+        content.title = NSLocalizedString("Notification.Title", comment: "")
+        content.body = NSLocalizedString("Notification.Body", comment: "")
         content.sound = UNNotificationSound.default
         content.categoryIdentifier = "OPTIONS_ACTION" // Links to AppDelegate
         

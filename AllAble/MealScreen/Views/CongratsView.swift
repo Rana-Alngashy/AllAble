@@ -33,12 +33,12 @@ struct CongratsView: View {
         VStack(spacing: 30) {
             
             // ————— HEADER —————
-            Text("Fantastic!")
+            Text("Title.Fantastic")
                 .font(.system(size: isCompact ? 36 : 72, weight: .heavy))
                 .foregroundColor(customYellow)
                 .padding(.top, isCompact ? 40 : 80)
             
-            Text("Dose complete! You managed your insulin like a pro.")
+            Text("Message.DoseComplete")
                 .font(isCompact ? .title3 : .title)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.black.opacity(0.8))

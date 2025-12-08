@@ -6,8 +6,14 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		73D91CFA2EE6E9E300314365 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 73D91CF82EE6E9E300314365 /* Localizable.strings */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		12ED8D042EDC676800B74FD1 /* AllAble.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AllAble.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		73D91CF92EE6E9E300314365 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		73D91CFC2EE6F09B00314365 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -45,6 +51,7 @@
 		12ED8CFB2EDC676800B74FD1 = {
 			isa = PBXGroup;
 			children = (
+				73D91CF82EE6E9E300314365 /* Localizable.strings */,
 				12ED8D062EDC676800B74FD1 /* AllAble */,
 				12ED8D052EDC676800B74FD1 /* Products */,
 			);
@@ -104,6 +111,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ar,
 			);
 			mainGroup = 12ED8CFB2EDC676800B74FD1;
 			minimizedProjectReferenceProxies = 1;
@@ -122,6 +130,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				73D91CFA2EE6E9E300314365 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -136,6 +145,18 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		73D91CF82EE6E9E300314365 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				73D91CF92EE6E9E300314365 /* en */,
+				73D91CFC2EE6F09B00314365 /* ar */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		12ED8D0D2EDC676900B74FD1 /* Debug */ = {

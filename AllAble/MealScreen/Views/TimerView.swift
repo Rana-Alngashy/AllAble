@@ -30,8 +30,7 @@ struct TimerView: View {
                 VStack {
                     
                     // ————— TITLE —————
-                    Text("Insulin Timer")
-                        .font(isCompact ? .title2 : .largeTitle)
+                    Text("Title.InsulinTimer")                        .font(isCompact ? .title2 : .largeTitle)
                         .bold()
                         .padding(.top, isCompact ? 30 : 50)
                     
@@ -58,7 +57,7 @@ struct TimerView: View {
                             viewModel.start()
                         }
                     }) {
-                        Text(viewModel.isActive ? "Timer Running..." : "Start Timer")
+                        Text(viewModel.isActive ? NSLocalizedString("Timer Running...", comment: "") : NSLocalizedString("Button.StartTimer", comment: ""))
                             .font(isCompact ? .title3 : .title3)
                             .bold()
                             .frame(maxWidth: buttonWidth)

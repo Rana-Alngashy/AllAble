@@ -218,14 +218,14 @@ struct CalculateView: View {
             VStack {
                 VStack(spacing: 30) {
                     
-                    Text("Your Insulin Dose")
-                        .font(.system(size: 34, weight: .bold))
+                    Text("Title.InsulinDose")                        .font(.system(size: 34, weight: .bold))
                         .padding(.top, 40)
                     
                     // ————— DETAILS BAR —————
                     HStack(spacing: 20) {
-                        InfoCard(title: "Total Carbs", value: "\(totalCarbs)g", icon: "fork.knife")
-                        InfoCard(title: "Carb Ratio", value: "1 : \(Int(carbRatio))", icon: "drop.fill")
+                        InfoCard(title: NSLocalizedString("TotalCarbs", comment: ""), value: "\(totalCarbs)g", icon: "fork.knife")
+                                                InfoCard(title: NSLocalizedString("Label.CarbRatio", comment: ""), value: "1 : \(Int(carbRatio))", icon: "drop.fill")
+                        
                     }
                     .padding(.horizontal, 40)
                     
@@ -269,8 +269,7 @@ struct CalculateView: View {
                         // Navigate
                         navigateToOptionView = true
                     }) {
-                        Text("Continue")
-                            .font(.title3.bold())
+                        Text("Button.Continue")                            .font(.title3.bold())
                             .foregroundColor(.black)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 15)

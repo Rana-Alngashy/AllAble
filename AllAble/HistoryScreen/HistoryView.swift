@@ -25,8 +25,7 @@ struct HistoryView: View {
                 
                 // ————— TITLE —————
                 HStack {
-                    Text("Meals")
-                        .font(isCompact ? .title : .largeTitle)   // ✅ Dynamic Type
+                    Text("Title.Meals")                        .font(isCompact ? .title : .largeTitle)   // ✅ Dynamic Type
                         .fontWeight(.heavy)
                         .foregroundColor(.gray.opacity(0.9))
                     
@@ -44,8 +43,7 @@ struct HistoryView: View {
                             .font(.system(size: isCompact ? 36 : 48))
                             .foregroundColor(.gray.opacity(0.6))
                         
-                        Text("No items found in the log")
-                            .font(.body)   // ✅ Dynamic Type
+                        Text("Title.Meals")                            .font(.body)   // ✅ Dynamic Type
                             .foregroundColor(.gray)
                     }
                     
@@ -79,11 +77,11 @@ struct HistoryView: View {
     
     private func localizedType(_ type: String) -> String {
         switch type.lowercased() {
-        case "breakfast", "فطور": return "Breakfast"
-        case "lunch", "غداء": return "Lunch"
-        case "dinner", "عشاء": return "Dinner"
-        case "snacks", "سناكس": return "Snacks"
-        default: return type
+        case "breakfast", NSLocalizedString("Type.Breakfast", comment: "").lowercased(): return NSLocalizedString("Type.Breakfast", comment: "")
+                case "lunch", NSLocalizedString("Type.Lunch", comment: "").lowercased(): return NSLocalizedString("Type.Lunch", comment: "")
+                case "dinner", NSLocalizedString("Type.Dinner", comment: "").lowercased(): return NSLocalizedString("Type.Dinner", comment: "")
+                case "snacks", NSLocalizedString("Type.Snacks", comment: "").lowercased(): return NSLocalizedString("Type.Snacks", comment: "")
+                default: return type
         }
     }
     
@@ -158,15 +156,15 @@ private struct MealLargeCard: View {
                 
                 // النصوص
                 VStack(alignment: .trailing, spacing: 6) {
-                    Text(type)
+                    Text(type) // هذا تم تعريبه في localizedType
                         .font(isCompact ? .title3 : .largeTitle)   // ✅ Dynamic Type
                         .fontWeight(.heavy)
                         .foregroundColor(.gray.opacity(0.9))
                     
                     VStack(alignment: .trailing, spacing: 4) {
-                        Text("Name of the meal: \(name)")
-                        Text("Carb: \(carbsText)")
-                        Text("Insulin dose: \(insulinText)")
+                        Text("\(NSLocalizedString("MealCard.Name", comment: "")) \(name)")
+                                                    Text("\(NSLocalizedString("MealCard.Carb", comment: "")) \(carbsText)")
+                                                    Text("\(NSLocalizedString("MealCard.InsulinDose", comment: "")) \(insulinText)")
                     }
                     .font(.body)   // ✅ Dynamic Type
                     .foregroundColor(.black.opacity(0.7))

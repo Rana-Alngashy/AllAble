@@ -35,6 +35,7 @@ struct SplashView: View {
             }
             .environment(\.layoutDirection, .rightToLeft) // FIX: تطبيق اتجاه العرض
         }
+        .environment(\.layoutDirection, .rightToLeft)
         .fullScreenCover(isPresented: $viewModel.shouldNavigateToNextScreen) {
             AvatarSelectionView()
         }

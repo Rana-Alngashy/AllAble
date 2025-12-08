@@ -30,8 +30,7 @@ struct AccountPage: View {
         
         var body: some View {
             VStack(alignment: .trailing, spacing: 8) {
-                Text(label)
-                    .font(.body.bold())
+                Text(LocalizedStringKey(label))                    .font(.body.bold())
                     .foregroundColor(.black.opacity(0.9))
                     .frame(maxWidth: .infinity, alignment: .trailing)
 
@@ -78,10 +77,10 @@ struct AccountPage: View {
                     
                     // ————— INPUTS —————
                     VStack(spacing: isCompact ? 20 : 35) {
-                        InputField(label: "Name", text: $name)
-                        InputField(label: "Age", text: $age)
-                        InputField(label: "Guardian Number", text: $guardianNumber)
-                        InputField(label: "Carbon Value", text: $carbonValue)
+                        InputField(label: "Account.Name", text: $name)
+                                                InputField(label: "Account.Age", text: $age)
+                                                InputField(label: "Account.GuardianNumber", text: $guardianNumber)
+                                                InputField(label: "Account.CarbonValue", text: $carbonValue)
                     }
                     .padding(.horizontal, isCompact ? 20 : 100)
                     .padding(.top, 20)
@@ -93,7 +92,7 @@ struct AccountPage: View {
                             showMainOverlay = true
                         }
                     }) {
-                        Text("Save")
+                        Text("Button.Save")
                             .font(.title3.bold())
                             .foregroundColor(.black)
                             .frame(maxWidth: isCompact ? 200 : 250)

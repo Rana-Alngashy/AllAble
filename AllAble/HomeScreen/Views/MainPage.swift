@@ -29,7 +29,7 @@ struct MainPage: View {
             let mealText = last.mealName.isEmpty ? last.mealTypeTitle : last.mealName
             return "\(doseText) for \(mealText)"
         } else {
-            return "No insulin dose yet"
+            return NSLocalizedString("LastDose.NoDose", comment: "")
         }
     }
     
@@ -92,7 +92,7 @@ struct MainPage: View {
     
     private var mainInfoCard: some View {
         VStack(spacing: 14) {
-            Text("Last insulin dose calculation")
+            Text("LastDose.Title")
                 .font(.headline)                      // ✅ Dynamic Type
                 .foregroundColor(.gray)
             
@@ -113,7 +113,7 @@ struct MainPage: View {
     
     private var calculateButton: some View {
         NavigationLink(destination: AddMealView()) {
-            Text("Calculate My Meal")
+            Text("Title.CalculateMeal")
                 .font(isCompact ? .headline : .title2)   // ✅ Dynamic Type
                 .foregroundColor(.black)
                 .frame(maxWidth: isCompact ? .infinity : 520)
@@ -125,7 +125,7 @@ struct MainPage: View {
     
     private var historyButton: some View {
         NavigationLink(destination: HistoryView()) {
-            Text("My Previous Meals")
+            Text("Button.MyMeals")
                 .font(isCompact ? .body : .title3)   // ✅ Dynamic Type
                 .foregroundColor(.black)
                 .frame(maxWidth: isCompact ? .infinity : 520)

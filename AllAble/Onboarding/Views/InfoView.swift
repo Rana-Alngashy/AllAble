@@ -467,6 +467,8 @@
 //    }
 //}
 
+
+
 import SwiftUI
 
 struct InfoView: View {
@@ -526,30 +528,26 @@ struct InfoView: View {
     private var formSection: some View {
         VStack(alignment: .leading, spacing: isCompact ? 20 : 30) {
             
-            Text("User Information")
-                .font(isCompact ? .title2 : .largeTitle)
+            Text("Title.UserInfo")                .font(isCompact ? .title2 : .largeTitle)
                 .bold()
                 .foregroundColor(.gray)
                 .padding(.top, isCompact ? 10 : 50)
             
             InfoInputField(
-                title: "Name",
-                text: $viewModel.name,
+                title: "Account.Name",                text: $viewModel.name,
                 brandBlueColor: brandBlueColor,
                 isCompact: isCompact
             )
             
             InfoInputField(
-                title: "Age",
-                text: $viewModel.age,
+                title: "Account.Age",                text: $viewModel.age,
                 brandBlueColor: brandBlueColor,
                 isCompact: isCompact
             )
             .keyboardType(.numberPad)
             
             CarbValueInputField(
-                title: "Carb Value",
-                text: $viewModel.carbValue,
+                title: "Account.CarbonValue",                text: $viewModel.carbValue,
                 isExplanationVisible: $viewModel.isCarbExplanationVisible,
                 toggleAction: viewModel.toggleCarbExplanation,
                 brandBlueColor: brandBlueColor,
@@ -558,8 +556,7 @@ struct InfoView: View {
             .keyboardType(.numberPad)
             
             if viewModel.isCarbExplanationVisible {
-                Text("Carb Value هو نسبة الكاربوهيدرات إلى الأنسولين (مثال: 10 جرام كارب لكل 1 وحدة أنسولين).")
-                    .font(.callout)
+                Text("Explanation.CarbValue")                    .font(.callout)
                     .foregroundColor(brandBlueColor)
                     .padding(.horizontal, 12)
             }
@@ -567,8 +564,7 @@ struct InfoView: View {
             Spacer(minLength: isCompact ? 20 : 40)
             
             Button(action: viewModel.handleNext) {
-                Text("NEXT")
-                    .font(isCompact ? .title3 : .title2)
+                Text("Button.Next")                    .font(isCompact ? .title3 : .title2)
                     .bold()
                     .frame(maxWidth: .infinity)
                     .frame(height: isCompact ? 50 : 60)

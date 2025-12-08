@@ -73,23 +73,21 @@ struct EditMealView: View {
             VStack(alignment: .leading, spacing: isCompact ? 24 : 40) {
                 
                 // ————— TITLE —————
-                Text("Meal Contents")
+                Text("Title.MealContents")
                     .font(.system(size: isCompact ? 26 : 40, weight: .bold))
                     .foregroundColor(.gray.opacity(0.9))
                 
                 // ————— MAIN MEAL INFO —————
                 VStack(alignment: .leading, spacing: 25) {
                     
-                    Text("Main Meal")
-                        .font(isCompact ? .title3 : .title2)
-                        .bold()
+                    Text("Label.MainMeal").font(isCompact ? .title3 : .title2).bold()
                     
-                    TextField("Meal name", text: $viewModel.mealName)
+                    TextField(LocalizedStringKey("Placeholder.MealName"), text: $viewModel.mealName)
                         .padding()
                         .background(.white)
                         .cornerRadius(14)
                     
-                    TextField("Carbs", text: $viewModel.mealCarbs)
+                    TextField(LocalizedStringKey("Placeholder.Carbs"), text: $viewModel.mealCarbs)
                         .keyboardType(.numberPad)
                         .padding()
                         .background(.white)
@@ -118,14 +116,13 @@ struct EditMealView: View {
                     
                     ForEach($viewModel.subItems) { $item in
                         VStack(spacing: 12) {
-                            TextField("Item name", text: $item.name)
+                            TextField(LocalizedStringKey("Placeholder.MealName"), text: $item.name)
                                 .padding()
                                 .background(.white)
                                 .cornerRadius(12)
                                 .font(.body)
                             
-                            TextField("Carbs", text: $item.carbs)
-                                .keyboardType(.numberPad)
+                            TextField(LocalizedStringKey("Placeholder.Carbs"), text: $item.carbs)                                .keyboardType(.numberPad)
                                 .padding()
                                 .background(.white)
                                 .cornerRadius(12)
@@ -137,7 +134,7 @@ struct EditMealView: View {
                 }
                 
                 // ————— TOTAL CARBS —————
-                Text("Total carbs: \(viewModel.totalCarbs)")
+                Text("\(NSLocalizedString("TotalCarbs", comment: "")) \(viewModel.totalCarbs)")
                     .font(isCompact ? .title3 : .title2)
                     .bold()
                     .foregroundColor(.black.opacity(0.7))
@@ -150,8 +147,7 @@ struct EditMealView: View {
                     // 2. Set state to true to trigger navigation
                     navigateToCalculateView = true
                 }) {
-                    Text("Calculate Insulin ")
-                        .font(isCompact ? .title3 : .title3)
+                    Text("Button.CalculateInsulin")                        .font(isCompact ? .title3 : .title3)
                         .bold()
                         .foregroundColor(.black)
                         .frame(maxWidth: .infinity)

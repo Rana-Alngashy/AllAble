@@ -21,7 +21,7 @@ struct OptionView: View {
     var body: some View {
         VStack(spacing: isCompact ? 30 : 50) {
             Spacer()
-            Text("Did you take the insulin shot?")
+            Text("Title.InsulinShot")
                 .font(isCompact ? .title2 : .largeTitle)
                 .bold()
                 .multilineTextAlignment(.center)
@@ -32,8 +32,7 @@ struct OptionView: View {
             Button(action: {
                 navigateToTimerView = true
             }) {
-                Text(" Yes, Start Timer")
-                    .font(isCompact ? .title3 : .title2)
+                Text("Button.YesTimer")                    .font(isCompact ? .title3 : .title2)
                     .bold()
                     .foregroundColor(.black)
                 
@@ -48,8 +47,7 @@ struct OptionView: View {
                 navigateToReminderView = true
             }) {
                 
-                Text("No, Set Reminder")
-                    .font(.title2)
+                Text("Button.NoReminder")                    .font(.title2)
                     .bold()
                     .foregroundColor(.black)
                     .frame(maxWidth: .infinity)

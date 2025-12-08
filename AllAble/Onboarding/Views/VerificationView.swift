@@ -63,8 +63,7 @@ struct VerificationView: View {
     private var formSection: some View {
         VStack(alignment: .leading, spacing: isCompact ? 24 : 40) {
             
-            Text("Parent Account Verification")
-                .font(isCompact ? .title3 : .title)
+                Text("Title.ParentVerification")                .font(isCompact ? .title3 : .title)
                 .bold()
                 .foregroundColor(brandBlueColor)
                 .padding(.top, isCompact ? 10 : 50)
@@ -87,6 +86,8 @@ struct VerificationView: View {
             }
             
             Spacer(minLength: isCompact ? 30 : 120)
+            
+                .environment(\.layoutDirection, .rightToLeft)
         }
     }
     
@@ -112,13 +113,11 @@ struct VerificationView: View {
         
         var body: some View {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Parent Email")
-                    .font(isCompact ? .body : .title2)
+                Text("Label.ParentEmail")                    .font(isCompact ? .body : .title2)
                     .bold()
                     .foregroundColor(brandBlueColor)
                 
-                TextField("Enter your parent's email", text: $viewModel.parentEmail)
-                    .font(.body)
+                TextField(LocalizedStringKey("Placeholder.Email"), text: $viewModel.parentEmail)                    .font(.body)
                     .foregroundColor(.gray)
                     .frame(height: isCompact ? 50 : 65)
                     .background(Color.white)
@@ -128,8 +127,7 @@ struct VerificationView: View {
                     .padding(.horizontal, 12)
                     
                 Button(action: viewModel.sendVerificationCode) {
-                    Text("SEND CODE")
-                        .font(isCompact ? .title3 : .title2)
+                    Text("Button.SendCode")                        .font(isCompact ? .title3 : .title2)
                         .bold()
                         .frame(maxWidth: .infinity)
                         .frame(height: isCompact ? 50 : 60)
@@ -153,8 +151,7 @@ struct VerificationView: View {
         var body: some View {
             VStack(alignment: .center, spacing: isCompact ? 24 : 40) {
                 
-                Text("Enter the 4-digit verification code")
-                    .font(isCompact ? .body : .title2)
+                Text("Instruction.EnterCode")                    .font(isCompact ? .body : .title2)
                     .foregroundColor(.gray)
                 
                 HStack(spacing: isCompact ? 12 : 20) {
@@ -172,8 +169,7 @@ struct VerificationView: View {
                 Button(action: {
                     viewModel.verifyCode(userData: userData)
                 }) {
-                    Text("VERIFY")
-                        .font(isCompact ? .title3 : .title2)
+                    Text("Button.Verify")                        .font(isCompact ? .title3 : .title2)
                         .bold()
                         .frame(maxWidth: .infinity)
                         .frame(height: isCompact ? 50 : 60)
@@ -225,6 +221,9 @@ struct VerificationView: View {
         }
     }
 }
+
+
+
 
 //import SwiftUI
 //

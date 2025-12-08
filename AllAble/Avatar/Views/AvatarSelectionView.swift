@@ -22,8 +22,7 @@ struct AvatarSelectionView: View {
             VStack(spacing: isCompact ? 24 : 40) {
                 
                 // ————— TITLE —————
-                Text("Choose Your Character")
-                    .font(isCompact ? .title2 : .largeTitle)
+                Text("Title.ChooseCharacter")                    .font(isCompact ? .title2 : .largeTitle)
                     .bold()
                     .padding(.top, isCompact ? 40 : 80)
                     .foregroundColor(.gray)
@@ -71,8 +70,7 @@ struct AvatarSelectionView: View {
                 
                 // ————— NEXT BUTTON —————
                 Button(action: viewModel.handleNextButton) {
-                    Text("NEXT")
-                        .font(isCompact ? .title3 : .title2)
+                    Text("Button.Next")                        .font(isCompact ? .title3 : .title2)
                         .bold()
                         .frame(maxWidth: isCompact ? .infinity : 250)
                         .frame(height: isCompact ? 50 : 60)
@@ -86,6 +84,7 @@ struct AvatarSelectionView: View {
             }
             .environment(\.layoutDirection, .rightToLeft)
         }
+        .environment(\.layoutDirection, .rightToLeft)
         .fullScreenCover(isPresented: $viewModel.shouldNavigateToInfo) {
             if let avatar = viewModel.selectedAvatar {
                 InfoView(selectedAvatar: avatar)
