@@ -11,6 +11,9 @@ struct HistoryView: View {
     // 🔥 استخدام HistoryStore لقراءة السجل فقط
     @EnvironmentObject var historyStore: HistoryStore
     
+    @Environment(\.horizontalSizeClass) private var hSize
+    private var isCompact: Bool { hSize == .compact }   // iPhone
+    
     // ألوان الخلفية العامة
     private let pageBackground = Color(red: 0.98, green: 0.96, blue: 0.90)
     
@@ -18,57 +21,58 @@ struct HistoryView: View {
         ZStack {
             pageBackground.ignoresSafeArea()
             
-            VStack(alignment: .trailing, spacing: 24) {
+            VStack(spacing: 16) {
                 
-                // شريط علوي (تم تبسيطه لغرض الدمج)
+                // ————— TITLE —————
                 HStack {
+                    Text("Meals")
+                        .font(isCompact ? .title : .largeTitle)   // ✅ Dynamic Type
+                        .fontWeight(.heavy)
+                        .foregroundColor(.gray.opacity(0.9))
+                    
                     Spacer()
                 }
-                .padding(.top, 10)
+                .padding(.horizontal, 24)
+                .padding(.top, 12)
                 
-                // العنوان الكبير
-                Text("Meals")
-                    .font(.system(size: 64, weight: .heavy))
-                    .foregroundColor(.gray.opacity(0.9))
-                    .padding(.trailing, 40)
-                
-                // عرض التاريخ الحقيقي من HistoryStore
+                // ————— EMPTY STATE / LIST —————
                 if historyStore.entries.isEmpty {
                     Spacer()
+                    
                     VStack(spacing: 12) {
                         Image(systemName: "tray")
-                            .font(.system(size: 50))
+                            .font(.system(size: isCompact ? 36 : 48))
                             .foregroundColor(.gray.opacity(0.6))
+                        
                         Text("No items found in the log")
+                            .font(.body)   // ✅ Dynamic Type
                             .foregroundColor(.gray)
                     }
+                    
                     Spacer()
                 } else {
                     ScrollView {
-                        VStack(spacing: 28) {
-                            // قراءة البيانات من المخزن
+                        VStack(spacing: 20) {
                             ForEach(historyStore.entries.reversed()) { entry in
                                 MealLargeCard(
                                     type: localizedType(entry.mealTypeTitle),
                                     name: entry.mealName,
-                                    carbsText: "\(String(format: "%.0f", entry.totalCarbs))g",
+                                    carbsText: "\(Int(entry.totalCarbs))g",
                                     insulinText: formatDose(entry.insulinDose),
                                     imageName: fallbackImageName(for: entry.mealTypeTitle),
-                                    background: backgroundColor(for: entry.mealTypeTitle)
+                                    background: backgroundColor(for: entry.mealTypeTitle),
+                                    isCompact: isCompact
                                 )
                             }
                         }
-                        .padding(.horizontal, 40)
-                        .padding(.bottom, 20)
+                        .padding(.horizontal, isCompact ? 16 : 20)
+                        .padding(.top, 8)
                     }
                 }
-                
-                Spacer(minLength: 0)
             }
         }
-        .environment(\.layoutDirection, .rightToLeft)
-        .navigationTitle("") // إخفاء عنوان الصفحة
-        .navigationBarTitleDisplayMode(.inline)
+        .environment(\.layoutDirection, .leftToRight)
+        .navigationBarHidden(false)
     }
     
     // MARK: - Helpers
@@ -96,11 +100,11 @@ struct HistoryView: View {
     private func backgroundColor(for type: String) -> Color {
         switch type.lowercased() {
         case "breakfast", "فطور":
-            return Color(red: 1.00, green: 0.98, blue: 0.80) // أصفر فاتح
+            return Color(red: 1.00, green: 0.98, blue: 0.80)
         case "lunch", "غداء":
-            return Color(red: 0.90, green: 0.98, blue: 0.85) // أخضر فاتح
+            return Color(red: 0.90, green: 0.98, blue: 0.85)
         case "dinner", "عشاء":
-            return Color(red: 0.90, green: 0.98, blue: 0.95) // أزرق/أخضر فاتح
+            return Color(red: 0.90, green: 0.98, blue: 0.95)
         case "snacks", "سناكس":
             return Color(#colorLiteral(red: 1.00, green: 0.90, blue: 0.95, alpha: 1))
         default:
@@ -117,7 +121,8 @@ struct HistoryView: View {
     }
 }
 
-// ... (Helper struct MealLargeCard) ...
+// MARK: - Meal Card
+
 private struct MealLargeCard: View {
     let type: String
     let name: String
@@ -125,46 +130,50 @@ private struct MealLargeCard: View {
     let insulinText: String
     let imageName: String
     let background: Color
+    let isCompact: Bool
     
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 36)
                 .fill(background)
                 .shadow(color: .black.opacity(0.12), radius: 12, x: 0, y: 6)
-                .frame(height: 170)
+                .frame(height: isCompact ? 140 : 170)
                 .overlay(
                     RoundedRectangle(cornerRadius: 36)
                         .stroke(Color.white.opacity(0.7), lineWidth: 3)
-                        .blur(radius: 0.5)
                 )
             
-            HStack(spacing: 18) {
+            HStack(spacing: 12) {
                 Spacer()
                 
-                // صورة الوجبة يمين
+                // صورة الوجبة
                 Image(imageName)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 150, height: 150)
-                    .padding(.trailing, 16)
+                    .frame(
+                        width: isCompact ? 90 : 150,
+                        height: isCompact ? 90 : 150
+                    )
+                    .padding(.trailing, 12)
                 
-                // النصوص في المنتصف
+                // النصوص
                 VStack(alignment: .trailing, spacing: 6) {
                     Text(type)
-                        .font(.system(size: 44, weight: .heavy))
+                        .font(isCompact ? .title3 : .largeTitle)   // ✅ Dynamic Type
+                        .fontWeight(.heavy)
                         .foregroundColor(.gray.opacity(0.9))
                     
-                    VStack(alignment: .trailing, spacing: 6) {
+                    VStack(alignment: .trailing, spacing: 4) {
                         Text("Name of the meal: \(name)")
                         Text("Carb: \(carbsText)")
-                        Text("insulin dose: \(insulinText)")
+                        Text("Insulin dose: \(insulinText)")
                     }
-                    .font(.system(size: 18, weight: .regular))
+                    .font(.body)   // ✅ Dynamic Type
                     .foregroundColor(.black.opacity(0.7))
                 }
-                .padding(.trailing, 40)
+                .padding(.trailing, isCompact ? 16 : 24)
                 
-                Spacer(minLength: 60)
+                Spacer(minLength: 20)
             }
         }
     }

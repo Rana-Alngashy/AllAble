@@ -62,24 +62,27 @@ struct EditMealView: View {
     
     // 1. State variable to trigger navigation to CalculateView
     @State private var navigateToCalculateView = false
-    
+    @Environment(\.horizontalSizeClass) private var hSize
+       private var isCompact: Bool { hSize == .compact }   // iPhone
+       
     var body: some View {
         ZStack {
             Color(#colorLiteral(red: 0.97, green: 0.96, blue: 0.92, alpha: 1))
                 .ignoresSafeArea()
-            
-            VStack(alignment: .leading, spacing: 40) {
+            ScrollView {
+            VStack(alignment: .leading, spacing: isCompact ? 24 : 40) {
                 
                 // ————— TITLE —————
                 Text("Meal Contents")
-                    .font(.system(size: 40, weight: .bold))
+                    .font(.system(size: isCompact ? 26 : 40, weight: .bold))
                     .foregroundColor(.gray.opacity(0.9))
                 
                 // ————— MAIN MEAL INFO —————
                 VStack(alignment: .leading, spacing: 25) {
                     
                     Text("Main Meal")
-                        .font(.title2).bold()
+                        .font(isCompact ? .title3 : .title2)
+                        .bold()
                     
                     TextField("Meal name", text: $viewModel.mealName)
                         .padding()
@@ -91,6 +94,8 @@ struct EditMealView: View {
                         .padding()
                         .background(.white)
                         .cornerRadius(14)
+                        .font(.body)
+                    
                 }
                 
                 // ————— SUB ITEMS —————
@@ -98,15 +103,15 @@ struct EditMealView: View {
                     
                     HStack {
                         Text("Add Sub Items")
-                            .font(.title3).bold()
-                        
+                            .font(isCompact ? .title3 : .title3)
+                            .bold()
                         Spacer()
                         
                         Button(action: {
                             viewModel.addSubItem()
                         }) {
                             Image(systemName: "plus.circle.fill")
-                                .font(.system(size: 30))
+                                .font(.system(size: isCompact ? 26 : 30))
                                 .foregroundColor(.yellow)
                         }
                     }
@@ -117,12 +122,15 @@ struct EditMealView: View {
                                 .padding()
                                 .background(.white)
                                 .cornerRadius(12)
+                                .font(.body)
                             
                             TextField("Carbs", text: $item.carbs)
                                 .keyboardType(.numberPad)
                                 .padding()
                                 .background(.white)
                                 .cornerRadius(12)
+                                .font(.body)
+                            
                         }
                     }
                     
@@ -130,11 +138,11 @@ struct EditMealView: View {
                 
                 // ————— TOTAL CARBS —————
                 Text("Total carbs: \(viewModel.totalCarbs)")
-                    .font(.title2)
+                    .font(isCompact ? .title3 : .title2)
                     .bold()
                     .foregroundColor(.black.opacity(0.7))
                 
-                Spacer()
+                Spacer(minLength: isCompact ? 20 : 40)
                 
                 // ————— BUTTON —————
                 Button(action: {
@@ -143,7 +151,8 @@ struct EditMealView: View {
                     navigateToCalculateView = true
                 }) {
                     Text("Calculate Insulin ")
-                        .font(.title3.bold())
+                        .font(isCompact ? .title3 : .title3)
+                        .bold()
                         .foregroundColor(.black)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -152,9 +161,10 @@ struct EditMealView: View {
                 }
                 
             }
-            .padding(.horizontal, 50)
-            .padding(.top, 40)
-            // 🔥 إصلاح خطأ الوسائط: تمرير mealName و mealType
+            .padding(.horizontal, isCompact ? 20 : 50)
+            .padding(.top, isCompact ? 20 : 40)
+        }
+        
             .navigationDestination(isPresented: $navigateToCalculateView) {
                 CalculateView(
                     totalCarbs: viewModel.totalCarbs,

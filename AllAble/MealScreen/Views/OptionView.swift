@@ -15,58 +15,57 @@ struct OptionView: View {
     
     let customYellow = Color(red: 0.99, green: 0.85, blue: 0.33)
     let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
+    @Environment(\.horizontalSizeClass) private var hSize
+    private var isCompact: Bool { hSize == .compact }   // iPhone
     
     var body: some View {
-        VStack(spacing: 50) {
-            
+        VStack(spacing: isCompact ? 30 : 50) {
+            Spacer()
             Text("Did you take the insulin shot?")
-                .font(.largeTitle)
+                .font(isCompact ? .title2 : .largeTitle)
                 .bold()
                 .multilineTextAlignment(.center)
-                .padding(.top, 50)
-
-            Spacer()
-
+                .padding(.top, isCompact ? 40 : 50)
+            
+            
             // ————— YES, START TIMER BUTTON —————
             Button(action: {
                 navigateToTimerView = true
             }) {
-                VStack {
-                    Text(" Yes, Start Timer")
-                        .font(.title2)
-                        .bold()
-                        .foregroundColor(.black)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 25)
-                .background(customYellow)
-                .cornerRadius(14)
+                Text(" Yes, Start Timer")
+                    .font(isCompact ? .title3 : .title2)
+                    .bold()
+                    .foregroundColor(.black)
+                
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, isCompact ? 18 : 25)
+                    .background(customYellow)
+                    .cornerRadius(14)
             }
             
             // ————— NO, SET REMINDER BUTTON —————
             Button(action: {
                 navigateToReminderView = true
             }) {
-                VStack {
-                    Text("No, Set Reminder")
-                        .font(.title2)
-                        .bold()
-                        .foregroundColor(.black)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 25)
-                .background(Color.white)
-                .cornerRadius(14)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .stroke(Color.gray, lineWidth: 1)
-                )
+                
+                Text("No, Set Reminder")
+                    .font(.title2)
+                    .bold()
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, isCompact ? 18 : 25)
+                    .background(Color.white)
+                    .cornerRadius(14)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(Color.gray, lineWidth: 1)
+                    )
             }
             
             Spacer()
             
         }
-        .padding(.horizontal, 50)
+        .padding(.horizontal, isCompact ? 20 : 50)
         .background(customBackground.ignoresSafeArea())
         
         
@@ -84,4 +83,6 @@ struct OptionView: View {
 
 #Preview {
     OptionView()
+        .environmentObject(NotificationRouter())
+    
 }

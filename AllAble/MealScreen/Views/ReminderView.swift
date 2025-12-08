@@ -17,31 +17,35 @@ struct ReminderView: View {
     // Define the custom colors using standard syntax
     let customYellow = Color(red: 0.99, green: 0.85, blue: 0.33)
     let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
+    @Environment(\.horizontalSizeClass) private var hSize
+    private var isCompact: Bool { hSize == .compact }   // iPhone
     
     var body: some View {
-        VStack(spacing: 30) {
-            
+        VStack(spacing: isCompact ? 24 : 30) {
+Spacer()
             Text("Set Insulin Reminder")
-                .font(.largeTitle)
+                .font(isCompact ? .title2 : .largeTitle)
                 .bold()
-                .padding(.top)
+                .padding(.top, isCompact ? 20 : 40)
 
-            Spacer()
+         //   Spacer()
 
             // ————— TIME PICKER —————
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 12) {
                 Text("Select Reminder Time")
-                    .font(.headline)
+                    .font(isCompact ? .subheadline : .headline)
                     .padding(.leading)
                     
                 DatePicker("", selection: $reminderTime, displayedComponents: .hourAndMinute)
                     .datePickerStyle(.wheel)
                     .labelsHidden()
-                    .frame(maxHeight: 150)
+                    .frame(maxHeight: isCompact ? 140 : 180)
             }
             .padding()
             .background(.white)
             .cornerRadius(12)
+            .padding(.horizontal, isCompact ? 20 : 30)
+
             
             Spacer()
             Spacer()
@@ -51,15 +55,16 @@ struct ReminderView: View {
                 scheduleNotification()
             }) {
                 Text("Save and Finish")
-                    .font(.title3.bold())
+                    .font(isCompact ? .title3 : .title3)
                     .foregroundColor(.black)
                     .frame(maxWidth: .infinity)
-                    .padding()
+                    .padding(.vertical, isCompact ? 18 : 24)
                     .background(customYellow)
                     .cornerRadius(14)
             }
+            .padding(.horizontal, isCompact ? 20 : 30)
+
         }
-        .padding(.horizontal, 30)
         .background(customBackground.ignoresSafeArea())
         .navigationTitle("Reminder")
     }
@@ -107,4 +112,6 @@ struct ReminderView: View {
 }
 #Preview {
     ReminderView()
+        .environmentObject(NotificationRouter())
+
 }

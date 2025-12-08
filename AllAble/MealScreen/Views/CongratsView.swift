@@ -22,7 +22,9 @@ struct CongratsView: View {
     let customYellow = Color(red: 0.99, green: 0.85, blue: 0.33)
     let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
     
-    var avatarImageName: String {
+    @Environment(\.horizontalSizeClass) private var hSize
+      private var isCompact: Bool { hSize == .compact }   // iPhone
+          var avatarImageName: String {
         // NOTE: These images must exist in your project's assets
         return avatarType == "male" ? "male_avatar_achievement" : "AvatarGirl"
     }
@@ -32,15 +34,15 @@ struct CongratsView: View {
             
             // ————— HEADER —————
             Text("Fantastic!")
-                .font(.system(size: 60, weight: .heavy))
-                .foregroundColor(customYellow) // Using custom yellow
-                .shadow(radius: 5)
-                .padding(.top, 80)
+                .font(.system(size: isCompact ? 36 : 72, weight: .heavy))
+                .foregroundColor(customYellow)
+                .padding(.top, isCompact ? 40 : 80)
             
-            Text("Dose complete! You managed your insulin like a pro.") // Final chosen message
-                .font(.title2)
+            Text("Dose complete! You managed your insulin like a pro.")
+                .font(isCompact ? .title3 : .title)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.black.opacity(0.8))
+                .padding(.horizontal, 20)
             
             Spacer()
             
@@ -48,10 +50,13 @@ struct CongratsView: View {
             Image(avatarImageName)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 350, height: 350)
+                .frame(
+                    width: isCompact ? 220 : 350,
+                    height: isCompact ? 220 : 350
+                )
                 .clipShape(Circle())
-                .overlay(Circle().stroke(customYellow, lineWidth: 8))
-                .shadow(color: customYellow.opacity(0.5), radius: 15)
+                .overlay(Circle().stroke(customYellow, lineWidth: isCompact ? 5 : 8))
+                .shadow(color: customYellow.opacity(0.4), radius: isCompact ? 8 : 15)
             
             Spacer()
             
@@ -69,19 +74,15 @@ struct CongratsView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(customBackground.ignoresSafeArea())
         .navigationBarHidden(true)
-        
-        // 2-second auto-navigation logic (Working Method)
         .onAppear {
             Task {
-                // Wait for 2 seconds (2,000,000,000 nanoseconds)
                 try await Task.sleep(nanoseconds: 2_000_000_000)
-                
-                // Trigger the hidden NavigationLink push
                 navigateToMainPage = true
             }
         }
     }
 }
+
 #Preview {
     CongratsView(avatarType: "female")
         .environmentObject(NotificationRouter())
