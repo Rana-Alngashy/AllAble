@@ -7,12 +7,15 @@
 
 // CongratsView.swift
 // CongratsView.swift
+
+
 import SwiftUI
 
 struct CongratsView: View {
     
     // MARK: - Navigation State
     // Required to trigger the hidden NavigationLink push to MainPage
+    @AppStorage("selectedAvatarImageName") private var selectedAvatarImageName: String = "AvatarGirl"
     @State private var navigateToMainPage = false
     
     // MARK: - Properties
@@ -47,7 +50,7 @@ struct CongratsView: View {
             Spacer()
             
             // ————— AVATAR IMAGE (Centered) —————
-            Image(avatarImageName)
+            Image(selectedAvatarImageName)
                 .resizable()
                 .scaledToFit()
                 .frame(

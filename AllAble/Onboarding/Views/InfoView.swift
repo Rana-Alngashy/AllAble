@@ -512,6 +512,7 @@ struct InfoView: View {
                 }
             }
         }
+//        .environment(\.layoutDirection, .rightToLeft)
         .fullScreenCover(isPresented: $viewModel.shouldNavigateToVerification) {
             let userData = UserDataForVerification(
                 name: viewModel.name,
@@ -528,7 +529,8 @@ struct InfoView: View {
     private var formSection: some View {
         VStack(alignment: .leading, spacing: isCompact ? 20 : 30) {
             
-            Text("Title.UserInfo")                .font(isCompact ? .title2 : .largeTitle)
+            Text("Title.UserInfo")
+                .font(isCompact ? .title2 : .largeTitle)
                 .bold()
                 .foregroundColor(.gray)
                 .padding(.top, isCompact ? 10 : 50)
@@ -599,7 +601,7 @@ struct InfoView: View {
         
         var body: some View {
             VStack(alignment: .leading, spacing: 8) {
-                Text(title)
+                Text(LocalizedStringKey(title))
                     .font(isCompact ? .body : .title2)
                     .bold()
                     .foregroundColor(brandBlueColor)
