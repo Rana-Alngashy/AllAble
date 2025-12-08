@@ -5,3 +5,91 @@
   Created by Wteen Alghamdy on 17/06/1447 AH.
   
 */
+/* Localizable.strings
+  AllAble
+
+  Created for English (Base) Localization.
+*/
+
+// MARK: - Account & User Info
+
+"Account.Name" = "Name";
+"Account.Age" = "Age";
+"Account.GuardianNumber" = "Guardian Number";
+"Account.CarbonValue" = "Carb Value";
+"Title.UserInfo" = "User Information";
+"Explanation.CarbValue" = "Carb Value is the ratio of carbohydrates to insulin (e.g., 10 grams of carb per 1 unit of insulin).";
+"Title.ChooseCharacter" = "Choose Your Character";
+"Toolbar.Account" = "Account";
+
+
+// MARK: - Onboarding & Verification
+
+"Title.ParentVerification" = "Parent Account Verification";
+"Label.ParentEmail" = "Parent Email";
+"Placeholder.Email" = "Enter your parent's email";
+"Button.SendCode" = "SEND CODE";
+"Instruction.EnterCode" = "Enter the 4-digit verification code";
+"Button.Verify" = "VERIFY";
+
+
+// MARK: - Main Page & Navigation
+
+"Button.Save" = "Save";
+"Button.Next" = "NEXT";
+"LastDose.Title" = "Last insulin dose calculation";
+"LastDose.NoDose" = "No insulin dose yet";
+"Button.MyMeals" = "My Previous Meals";
+"Timer Running..." = "Timer Running..."; // Used in TimerView
+
+
+// MARK: - Calculation & Meal Logging
+
+"Title.CalculateMeal" = "Calculate My Meal";
+"Title.MealContents" = "Meal Contents";
+"Label.MainMeal" = "Main Meal";
+"Placeholder.MealName" = "Meal name";
+"Placeholder.Carbs" = "Carbs";
+"Label.SubItems" = "Add Sub Items";
+"TotalCarbs" = "Total carbs:";
+"Button.CalculateInsulin" = "Calculate Insulin";
+"Title.InsulinDose" = "Your Insulin Dose";
+"Label.CarbRatio" = "Carb Ratio";
+"Button.Continue" = "Continue";
+
+
+// MARK: - History
+
+"Title.Meals" = "Meals";
+"EmptyState.NoLog" = "No items found in the log";
+"MealCard.Name" = "Name of the meal:";
+"MealCard.Carb" = "Carb:";
+"MealCard.InsulinDose" = "Insulin dose:";
+"Type.Breakfast" = "Breakfast";
+"Type.Lunch" = "Lunch";
+"Type.Dinner" = "Dinner";
+"Type.Snacks" = "Snacks";
+
+
+// MARK: - Options, Reminder & Timer
+
+"Title.InsulinShot" = "Did you take the insulin shot?";
+"Button.YesTimer" = "Yes, Start Timer";
+"Button.NoReminder" = "No, Set Reminder";
+"Title.SetReminder" = "Set Insulin Reminder";
+"Label.SelectTime" = "Select Reminder Time";
+"Button.SaveFinish" = "Save and Finish";
+"Title.InsulinTimer" = "Insulin Timer";
+"Button.StartTimer" = "Start Timer";
+
+
+// MARK: - Congrats Screen
+
+"Title.Fantastic" = "Fantastic!";
+"Message.DoseComplete" = "Dose complete! You managed your insulin like a pro.";
+
+
+// MARK: - Notifications
+
+"Notification.Title" = "Insulin Update";
+"Notification.Body" = "Update your status.";
