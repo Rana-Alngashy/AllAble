@@ -103,7 +103,7 @@ struct HistoryView: View {
         switch type.lowercased() {
         case "breakfast", "فطور": return "egg"
         case "lunch", "غداء": return "lunch"
-        case "dinner", "عشاء": return "salad"
+        case "dinner", "عشاء": return "dinnerImg"
         case "snacks", "سناكس": return "snacksImg"
         default: return "egg"
         }
@@ -210,6 +210,7 @@ private struct MealLargeCard: View {
     
     var body: some View {
         ZStack {
+            // Background Card
             RoundedRectangle(cornerRadius: 32)
                 .fill(background)
                 .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 5)
@@ -223,7 +224,7 @@ private struct MealLargeCard: View {
                 
                 if isArabic { Spacer(minLength: 8) }
                 
-                // صورة الوجبة
+                // Meal Image
                 Image(imageName)
                     .resizable()
                     .scaledToFit()
@@ -231,34 +232,58 @@ private struct MealLargeCard: View {
                            height: isCompact ? 80 : 110)
                     .padding(.horizontal, 6)
                 
-                // النصوص
+                // Content Stack
                 VStack(
                     alignment: isArabic ? .trailing : .leading,
                     spacing: 8
                 ) {
-                    // عنوان (نوع الوجبة)
+                    // Meal Type Title (e.g., Breakfast)
                     Text(type)
                         .font(isCompact ? .title3.bold() : .title2.bold())
                         .foregroundColor(.gray.opacity(0.85))
                     
-                    // المعلومات
-                    VStack(
-                        alignment: isArabic ? .trailing : .leading,
-                        spacing: 5
-                    ) {
-                        if isArabic {
-                            Text("\(NSLocalizedString("MealCard.Name", comment: "")) \(name)")
-                            Text("\(NSLocalizedString("MealCard.Carb", comment: "")) \(carbsText)")
-                            Text("\(NSLocalizedString("MealCard.InsulinDose", comment: "")) \(insulinText)")
-                        } else {
-                            Text("\(NSLocalizedString("MealCard.Name", comment: "")): \(name)")
-                            Text("\(NSLocalizedString("MealCard.Carb", comment: "")): \(carbsText)")
-                            Text("\(NSLocalizedString("MealCard.InsulinDose", comment: "")): \(insulinText)")
+                    // HIG-Compliant Data Grid
+                    // This aligns labels in one column and values in the other
+                    Grid(alignment: isArabic ? .topTrailing : .topLeading, horizontalSpacing: 12, verticalSpacing: 6) {
+                        
+                        // Row 1: Name
+                        GridRow {
+                            Text(NSLocalizedString("MealCard.Name", comment: ""))
+                                .foregroundColor(.gray)
+                                .font(isCompact ? .footnote : .callout)
+                            
+                            Text(name)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.black.opacity(0.8))
+                                .font(isCompact ? .footnote : .callout)
+                                .lineLimit(1) // Prevents awkward wrapping
+                                .minimumScaleFactor(0.9)
+                        }
+                        
+                        // Row 2: Carbs
+                        GridRow {
+                            Text(NSLocalizedString("MealCard.Carb", comment: ""))
+                                .foregroundColor(.gray)
+                                .font(isCompact ? .footnote : .callout)
+                            
+                            Text(carbsText)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.black.opacity(0.8))
+                                .font(isCompact ? .footnote : .callout)
+                        }
+                        
+                        // Row 3: Insulin
+                        GridRow {
+                            Text(NSLocalizedString("MealCard.InsulinDose", comment: ""))
+                                .foregroundColor(.gray)
+                                .font(isCompact ? .footnote : .callout)
+                            
+                            Text(insulinText)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.black.opacity(0.8))
+                                .font(isCompact ? .footnote : .callout)
                         }
                     }
-                    .font(isCompact ? .body : .title3)
-                    .foregroundColor(.black.opacity(0.78))
-
                 }
                 .padding(isArabic ? .trailing : .leading, 12)
                 
@@ -270,7 +295,6 @@ private struct MealLargeCard: View {
         .animation(.easeOut, value: name)
     }
 }
-
 #Preview {
     let store = HistoryStore()        // بدون إدخال أي entries
     let viewModel = HistoryViewModel(store: store)
