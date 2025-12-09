@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MainPage: View {
     
+    
     @EnvironmentObject var router: NotificationRouter
     @EnvironmentObject var historyStore: HistoryStore  // ✅ قراءة السجل من البيئة
     
@@ -123,20 +124,41 @@ struct MainPage: View {
         }
     }
     
+//    private var historyButton: some View {
+//        NavigationLink(destination: HistoryView(viewModel: HistoryViewModel(store: HistoryStore()))) {
+//            Text("Button.MyMeals")
+//                .font(isCompact ? .body : .title3)   // ✅ Dynamic Type
+//                .foregroundColor(.black)
+//                .frame(maxWidth: isCompact ? .infinity : 520)
+//                .frame(height: isCompact ? 56 : 85)
+//                .overlay(
+//                    RoundedRectangle(cornerRadius: 16)
+//                        .stroke(Color(#colorLiteral(red: 0.99, green: 0.85, blue: 0.33, alpha: 1)), lineWidth: 3)
+//                )
+//        }
+//    }
+//
     private var historyButton: some View {
-        NavigationLink(destination: HistoryView()) {
+        NavigationLink {
+            HistoryView(
+                viewModel: HistoryViewModel(store: historyStore)  // ← هنا نستخدم المخزن المشترك
+            )
+        } label: {
             Text("Button.MyMeals")
-                .font(isCompact ? .body : .title3)   // ✅ Dynamic Type
+                .font(isCompact ? .body : .title3)
                 .foregroundColor(.black)
                 .frame(maxWidth: isCompact ? .infinity : 520)
                 .frame(height: isCompact ? 56 : 85)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color(#colorLiteral(red: 0.99, green: 0.85, blue: 0.33, alpha: 1)), lineWidth: 3)
+                        .stroke(
+                            Color(#colorLiteral(red: 0.99, green: 0.85, blue: 0.33, alpha: 1)),
+                            lineWidth: 3
+                        )
                 )
         }
     }
-    
+
     private var avatarSection: some View {
         VStack(spacing: 18) {
             Image(selectedAvatarImageName)

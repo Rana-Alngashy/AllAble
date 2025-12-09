@@ -12,17 +12,15 @@ struct ReminderView: View {
     
     @State private var reminderTime = Date()
     
-    // Router for clearing navigation stack
     @EnvironmentObject var router: NotificationRouter
-    
-    // NEW: Allows dismissing the view instantly
     @Environment(\.dismiss) private var dismiss
-    
+    @State private var goToHome = false   // <<⭐ مهم
+
     let customYellow = Color(red: 0.99, green: 0.85, blue: 0.33)
     let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
     
     @Environment(\.horizontalSizeClass) private var hSize
-    private var isCompact: Bool { hSize == .compact }   // iPhone
+    private var isCompact: Bool { hSize == .compact }
     
     var body: some View {
         VStack(spacing: isCompact ? 24 : 30) {
@@ -34,8 +32,6 @@ struct ReminderView: View {
                 .bold()
                 .padding(.top, isCompact ? 20 : 40)
             
-            
-            // ————— TIME PICKER —————
             VStack(alignment: .leading, spacing: 12) {
                 Text("Label.SelectTime")
                     .font(isCompact ? .subheadline : .headline)
@@ -51,12 +47,9 @@ struct ReminderView: View {
             .cornerRadius(12)
             .padding(.horizontal, isCompact ? 20 : 30)
             
-            
             Spacer()
             Spacer()
             
-            
-            // ————— SAVE BUTTON —————
             Button(action: {
                 scheduleNotification()
             }) {
@@ -69,10 +62,14 @@ struct ReminderView: View {
                     .cornerRadius(14)
             }
             .padding(.horizontal, isCompact ? 20 : 30)
-            
         }
         .background(customBackground.ignoresSafeArea())
         .navigationTitle("Reminder")
+        
+        // ⭐⭐⭐ HERE — THIS IS THE CORRECT PLACE ⭐⭐⭐
+        .fullScreenCover(isPresented: $goToHome) {
+            MainPage()
+        }
     }
     
     
@@ -91,11 +88,11 @@ struct ReminderView: View {
     
     private func setLocalNotification() {
         let center = UNUserNotificationCenter.current()
-        let content = UNMutableNotificationContent()
         
+        let content = UNMutableNotificationContent()
         content.title = NSLocalizedString("Notification.Title", comment: "")
         content.body = NSLocalizedString("Notification.Body", comment: "")
-        content.sound = UNNotificationSound.default
+        content.sound = .default
         content.categoryIdentifier = "OPTIONS_ACTION"
         
         let dateComponents = Calendar.current.dateComponents([.hour, .minute], from: reminderTime)
@@ -108,12 +105,10 @@ struct ReminderView: View {
                 print("Error scheduling notification: \(error.localizedDescription)")
             } else {
                 DispatchQueue.main.async {
-                    
-                    // Clear main navigation path
                     router.navigationPath = NavigationPath()
                     
-                    // ⭐ NEW: Instantly return to MainPage
-                    dismiss()
+                    // ⭐⭐ THIS NOW WORKS ⭐⭐
+                    goToHome = true
                     
                     print("Notification scheduled. Returning to MainPage.")
                 }

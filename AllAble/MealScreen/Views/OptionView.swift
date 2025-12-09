@@ -4,23 +4,26 @@
 //
 //  Created by Rana Alngashy on 12/06/1447 AH.
 //
-
 import SwiftUI
 
 struct OptionView: View {
     
     @EnvironmentObject var router: NotificationRouter
+    
     @State private var navigateToReminderView = false
     @State private var navigateToTimerView = false
     
     let customYellow = Color(red: 0.99, green: 0.85, blue: 0.33)
     let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
+
     @Environment(\.horizontalSizeClass) private var hSize
-    private var isCompact: Bool { hSize == .compact }   // iPhone
+    private var isCompact: Bool { hSize == .compact }
     
     var body: some View {
         VStack(spacing: isCompact ? 30 : 50) {
+            
             Spacer()
+            
             Text("Title.InsulinShot")
                 .font(isCompact ? .title2 : .largeTitle)
                 .bold()
@@ -32,22 +35,23 @@ struct OptionView: View {
             Button(action: {
                 navigateToTimerView = true
             }) {
-                Text("Button.YesTimer")                    .font(isCompact ? .title3 : .title2)
+                Text("Button.YesTimer")
+                    .font(isCompact ? .title3 : .title2)
                     .bold()
                     .foregroundColor(.black)
-                
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, isCompact ? 18 : 25)
                     .background(customYellow)
                     .cornerRadius(14)
             }
             
+            
             // ————— NO, SET REMINDER BUTTON —————
             Button(action: {
-                navigateToReminderView = true
+                navigateToReminderView = true     // <<⭐ الآن يفعل fullScreenCover
             }) {
-                
-                Text("Button.NoReminder")                    .font(.title2)
+                Text("Button.NoReminder")
+                    .font(isCompact ? .title3 : .title2)
                     .bold()
                     .foregroundColor(.black)
                     .frame(maxWidth: .infinity)
@@ -61,7 +65,6 @@ struct OptionView: View {
             }
             
             Spacer()
-            
         }
         .padding(.horizontal, isCompact ? 20 : 50)
         .background(customBackground.ignoresSafeArea())
@@ -69,18 +72,21 @@ struct OptionView: View {
         
         // ————— NAVIGATION DESTINATIONS —————
         
-        .navigationDestination(isPresented: $navigateToReminderView) {
-            ReminderView()
-        }
-        
         .navigationDestination(isPresented: $navigateToTimerView) {
             TimerView()
+        }
+        
+        
+        // ⭐⭐ Full Screen Reminder (الأفضل هنا)
+        .fullScreenCover(isPresented: $navigateToReminderView) {
+            ReminderView()
+                .environmentObject(router)
         }
     }
 }
 
+
 #Preview {
     OptionView()
         .environmentObject(NotificationRouter())
-    
 }
