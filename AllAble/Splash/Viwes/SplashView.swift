@@ -5,43 +5,45 @@
 //  Created by Wteen Alghamdy on 14/06/1447 AH.
 //
 
-
 import SwiftUI
 
 struct SplashView: View {
     @StateObject var viewModel = SplashViewModel()
     
-    // FIX: تعريف الألوان محلياً بدلاً من AppConstants
-    let backgroundColor = Color(red: 0.97, green: 0.96, blue: 0.92)
-    let starSplashImage = "starSplashImg"
+    @State private var animate = false
+    
+    let backgroundColor = Color(#colorLiteral(red: 0.992, green: 0.863, blue: 0.345, alpha: 1))
+    let starSplashImage = "logoSplash"
     
     var body: some View {
         ZStack {
-            backgroundColor.edgesIgnoringSafeArea(.all)
+            backgroundColor.ignoresSafeArea()
             
             VStack {
                 Spacer()
-                
+
                 Image(starSplashImage)
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 1100, height: 1100)
-                    .padding(.top, 200)
-
+                    .scaledToFit()
+                    .frame(maxWidth: UIScreen.main.bounds.width * 0.60)
+                    .scaleEffect(animate ? 1 : 0.6)
+                    .opacity(animate ? 1 : 0)
+                    .offset(y: animate ? 0 : 40)
+                    .animation(.easeOut(duration: 1.2), value: animate)
+                
+                Spacer()
             }
-            .contentShape(Rectangle())
             .onAppear {
+                animate = true
                 viewModel.startAppInitialization()
             }
-            .environment(\.layoutDirection, .rightToLeft) // FIX: تطبيق اتجاه العرض
         }
-        .environment(\.layoutDirection, .rightToLeft)
         .fullScreenCover(isPresented: $viewModel.shouldNavigateToNextScreen) {
             AvatarSelectionView()
         }
     }
 }
+
 #Preview {
     SplashView()
 }
-

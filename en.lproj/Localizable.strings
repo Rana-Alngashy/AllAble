@@ -18,7 +18,7 @@
 "Account.GuardianNumber" = "Guardian Number";
 "Account.CarbonValue" = "Carb Value";
 "Title.UserInfo" = "User Information";
-"Explanation.CarbValue" = "Carb Value is the ratio of carbohydrates to insulin (e.g., 10 grams of carb per 1 unit of insulin).";
+"Explanation.CarbValue" = "Your carb ratio tells you how many units of insulin you need for the carbs you eat ✨ .";
 "Title.ChooseCharacter" = "Choose Your Character";
 "Toolbar.Account" = "Account";
 
