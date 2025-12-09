@@ -298,7 +298,6 @@
 //
 //  Created by Rana Alngashy on 09/06/1447 AH.
 //
-
 import SwiftUI
 import UserNotifications
 import Combine
@@ -329,48 +328,79 @@ struct AllAbleApp: App {
 
     var body: some Scene {
         WindowGroup {
-            // 🎯 التنقل المشروط
-            if hasCompletedOnboarding {
-                MainPage()
-                    .environmentObject(router)
-                    // 2. حقن مخزن السجل في البيئة
-                    .environmentObject(historyStore)
-            } else {
-                SplashView()
-                    .environmentObject(router)
-                    // 2. حقن مخزن السجل في البيئة
-                    .environmentObject(historyStore)
+
+            Group {
+                // 🎯 التنقل المشروط
+                if hasCompletedOnboarding {
+                    MainPage()
+                        .environmentObject(router)
+                        .environmentObject(historyStore)
+                } else {
+                    SplashView()
+                        .environmentObject(router)
+                        .environmentObject(historyStore)
+                }
             }
+            .preferredColorScheme(.light)   // 🌟 ONE LINE THAT FORCES LIGHT MODE
         }
     }
 }
 
-// ... (Keep the rest of your AppDelegate code exactly as it is)
+// -------------------------------------------------
+// MARK: - AppDelegate (Keep same, no changes needed)
+// -------------------------------------------------
+
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+    
     var router: NotificationRouter?
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
+    ) -> Bool {
+        
         UNUserNotificationCenter.current().delegate = self
-        let optionsCategory = UNNotificationCategory(identifier: "OPTIONS_ACTION", actions: [], intentIdentifiers: [], options: .customDismissAction)
+        
+        let optionsCategory = UNNotificationCategory(
+            identifier: "OPTIONS_ACTION",
+            actions: [],
+            intentIdentifiers: [],
+            options: .customDismissAction
+        )
+        
         UNUserNotificationCenter.current().setNotificationCategories([optionsCategory])
+        
         return true
     }
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+    
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        
         if response.notification.request.content.categoryIdentifier == "OPTIONS_ACTION" {
             DispatchQueue.main.async {
                 self.router?.shouldNavigateToOptionView = true
             }
         }
+        
         completionHandler()
     }
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        
         completionHandler([.banner, .sound, .list])
     }
 }
-#Preview {
-    // إنشاء كائن وهمي (Mock) للـ Router لأنه مطلوب في بيئة التطبيق
-    let mockRouter = NotificationRouter()
 
-    // معاينة الواجهة الجذرية الافتراضية (SplashView) مع حقن الـ Router
+#Preview {
+    let mockRouter = NotificationRouter()
+    
     SplashView()
         .environmentObject(mockRouter)
 }
