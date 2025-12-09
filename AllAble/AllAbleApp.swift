@@ -303,6 +303,7 @@ import UserNotifications
 import Combine
 
 class NotificationRouter: ObservableObject {
+    
     @Published var shouldNavigateToOptionView = false
     @Published var navigationPath = NavigationPath()
 }

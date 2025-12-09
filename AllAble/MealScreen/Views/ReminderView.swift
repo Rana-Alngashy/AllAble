@@ -4,6 +4,7 @@
 //
 //  Created by Rana Alngashy on 12/06/1447 AH.
 //
+
 import SwiftUI
 import UserNotifications
 
@@ -11,31 +12,35 @@ struct ReminderView: View {
     
     @State private var reminderTime = Date()
     
-    // 1. Inject the router to access the global path
+    // Router for clearing navigation stack
     @EnvironmentObject var router: NotificationRouter
     
-    // Define the custom colors using standard syntax
+    // NEW: Allows dismissing the view instantly
+    @Environment(\.dismiss) private var dismiss
+    
     let customYellow = Color(red: 0.99, green: 0.85, blue: 0.33)
     let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
+    
     @Environment(\.horizontalSizeClass) private var hSize
     private var isCompact: Bool { hSize == .compact }   // iPhone
     
     var body: some View {
         VStack(spacing: isCompact ? 24 : 30) {
-Spacer()
+            
+            Spacer()
+            
             Text("Title.SetReminder")
                 .font(isCompact ? .title2 : .largeTitle)
                 .bold()
                 .padding(.top, isCompact ? 20 : 40)
-
-         //   Spacer()
-
+            
+            
             // ————— TIME PICKER —————
             VStack(alignment: .leading, spacing: 12) {
                 Text("Label.SelectTime")
                     .font(isCompact ? .subheadline : .headline)
                     .padding(.leading)
-                    
+                
                 DatePicker("", selection: $reminderTime, displayedComponents: .hourAndMinute)
                     .datePickerStyle(.wheel)
                     .labelsHidden()
@@ -45,10 +50,11 @@ Spacer()
             .background(.white)
             .cornerRadius(12)
             .padding(.horizontal, isCompact ? 20 : 30)
-
+            
             
             Spacer()
             Spacer()
+            
             
             // ————— SAVE BUTTON —————
             Button(action: {
@@ -63,16 +69,16 @@ Spacer()
                     .cornerRadius(14)
             }
             .padding(.horizontal, isCompact ? 20 : 30)
-
+            
         }
         .background(customBackground.ignoresSafeArea())
         .navigationTitle("Reminder")
     }
     
+    
     // MARK: - Notification Logic
     
     func scheduleNotification() {
-        // Request authorization before scheduling
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
             if success {
                 self.setLocalNotification()
@@ -82,6 +88,7 @@ Spacer()
         }
     }
     
+    
     private func setLocalNotification() {
         let center = UNUserNotificationCenter.current()
         let content = UNMutableNotificationContent()
@@ -89,9 +96,8 @@ Spacer()
         content.title = NSLocalizedString("Notification.Title", comment: "")
         content.body = NSLocalizedString("Notification.Body", comment: "")
         content.sound = UNNotificationSound.default
-        content.categoryIdentifier = "OPTIONS_ACTION" // Links to AppDelegate
+        content.categoryIdentifier = "OPTIONS_ACTION"
         
-        // Trigger setup (Daily repeat at selected time)
         let dateComponents = Calendar.current.dateComponents([.hour, .minute], from: reminderTime)
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
         
@@ -101,17 +107,22 @@ Spacer()
             if let error = error {
                 print("Error scheduling notification: \(error.localizedDescription)")
             } else {
-                // 2. CRITICAL FIX: Clear the NavigationPath to pop to the root view (MainPage)
                 DispatchQueue.main.async {
+                    
+                    // Clear main navigation path
                     router.navigationPath = NavigationPath()
-                    print("Notification scheduled. Navigation path cleared to return to MainPage.")
+                    
+                    // ⭐ NEW: Instantly return to MainPage
+                    dismiss()
+                    
+                    print("Notification scheduled. Returning to MainPage.")
                 }
             }
         }
     }
 }
+
 #Preview {
     ReminderView()
         .environmentObject(NotificationRouter())
-
 }
