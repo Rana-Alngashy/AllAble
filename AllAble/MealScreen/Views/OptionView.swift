@@ -12,13 +12,13 @@ struct OptionView: View {
     
     @State private var navigateToReminderView = false
     @State private var navigateToTimerView = false
-    
+    @EnvironmentObject var historyStore: HistoryStore
+
     let customYellow = Color(red: 0.99, green: 0.85, blue: 0.33)
     let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
 
     @Environment(\.horizontalSizeClass) private var hSize
-    private var isCompact: Bool { hSize == .compact }
-    
+    private var isCompact: Bool { true}  
     var body: some View {
         VStack(spacing: isCompact ? 30 : 50) {
             
@@ -81,7 +81,11 @@ struct OptionView: View {
         .fullScreenCover(isPresented: $navigateToReminderView) {
             ReminderView()
                 .environmentObject(router)
+                .environmentObject(historyStore)
         }
+
+        .toolbarTitleDisplayMode(.inline)   // ← هنا المكان الصحيح
+
     }
 }
 

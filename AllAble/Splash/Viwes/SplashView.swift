@@ -9,7 +9,9 @@ import SwiftUI
 
 struct SplashView: View {
     @StateObject var viewModel = SplashViewModel()
-    
+    @EnvironmentObject var router: NotificationRouter
+    @EnvironmentObject var historyStore: HistoryStore
+
     @State private var animate = false
     
     let backgroundColor = Color(#colorLiteral(red: 0.992, green: 0.863, blue: 0.345, alpha: 1))
@@ -40,10 +42,9 @@ struct SplashView: View {
         }
         .fullScreenCover(isPresented: $viewModel.shouldNavigateToNextScreen) {
             AvatarSelectionView()
+                .environmentObject(router)        // ← مهم جدًا
+                .environmentObject(historyStore)  // ← مهم جدًا
         }
     }
 }
 
-#Preview {
-    SplashView()
-}

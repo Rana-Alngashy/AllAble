@@ -15,13 +15,13 @@ struct ReminderView: View {
     @EnvironmentObject var router: NotificationRouter
     @Environment(\.dismiss) private var dismiss
     @State private var goToHome = false   // <<⭐ مهم
+    @EnvironmentObject var historyStore: HistoryStore
 
     let customYellow = Color(red: 0.99, green: 0.85, blue: 0.33)
     let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
     
     @Environment(\.horizontalSizeClass) private var hSize
-    private var isCompact: Bool { hSize == .compact }
-    
+    private var isCompact: Bool { true}  
     var body: some View {
         VStack(spacing: isCompact ? 24 : 30) {
             
@@ -69,7 +69,12 @@ struct ReminderView: View {
         // ⭐⭐⭐ HERE — THIS IS THE CORRECT PLACE ⭐⭐⭐
         .fullScreenCover(isPresented: $goToHome) {
             MainPage()
+                .environmentObject(router)
+                .environmentObject(historyStore)
         }
+
+        .toolbarTitleDisplayMode(.inline)   // ← هنا المكان الصحيح
+
     }
     
     

@@ -19,7 +19,8 @@ import SwiftUI
 class AvatarSelectionViewModel: ObservableObject {
     @Published var selectedAvatar: Avatar? = nil
     @Published var shouldNavigateToInfo = false
-    
+    @AppStorage("selectedAvatarImageName") private var storedAvatarName: String = ""
+
     let availableAvatars = Avatar.allAvatars
     
     var isNextButtonEnabled: Bool {
@@ -31,8 +32,10 @@ class AvatarSelectionViewModel: ObservableObject {
     }
     
     func handleNextButton() {
-        if selectedAvatar != nil {
+        if let avatar = selectedAvatar {
+            storedAvatarName = avatar.imageName   // 👈 حفظ أسم صورة الأفتار
             shouldNavigateToInfo = true
         }
     }
+
 }

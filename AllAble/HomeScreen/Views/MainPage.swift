@@ -6,16 +6,13 @@ struct MainPage: View {
     @EnvironmentObject var router: NotificationRouter
     @EnvironmentObject var historyStore: HistoryStore  // ✅ قراءة السجل من البيئة
     
-    @AppStorage("selectedAvatarImageName") private var selectedAvatarImageName: String = "AvatarGirl"
-    @AppStorage("account.name") private var userName: String = "Sarah"
+    @AppStorage("selectedAvatarImageName") private var selectedAvatarImageName: String = ""
+    @AppStorage("Account.Name") private var userName: String = "Sarah"
     
     @Environment(\.horizontalSizeClass) private var hSize
     @StateObject private var viewModel = MainPageViewModel()
     
-    private var isCompact: Bool {
-        hSize == .compact   // iPhone
-    }
-    
+    private var isCompact: Bool { true}  
     // ✅ نص آخر جرعة فعلية من السجل
     private var lastDoseDisplayText: String {
         if let last = historyStore.entries.last {

@@ -16,7 +16,7 @@ struct TimerView: View {
     let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
     
     @Environment(\.horizontalSizeClass) private var hSize
-    private var isCompact: Bool { hSize == .compact }   // iPhone
+    private var isCompact: Bool { true}   // iPhone
     
     // Sizes depend on device
     private var circleSize: CGFloat { isCompact ? 200 : 250 }
@@ -26,7 +26,6 @@ struct TimerView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                
                 VStack {
                     
                     // ————— TITLE —————
@@ -35,7 +34,6 @@ struct TimerView: View {
                         .padding(.top, isCompact ? 30 : 50)
                     
                     Spacer()
-                    
                     // ————— TIMER CIRCLE —————
                     ZStack {
                         Circle()
@@ -50,7 +48,6 @@ struct TimerView: View {
                     }
                     
                     Spacer()
-                    
                     // ————— START BUTTON —————
                     Button(action: {
                         if !viewModel.isActive && viewModel.timeRemaining > 0 {
@@ -86,13 +83,20 @@ struct TimerView: View {
         }
         .onReceive(viewModel.$isFinished) { finished in
             if finished {
-                navigateToCongratsView = true
+                DispatchQueue.main.async {
+                    withAnimation {
+                        navigateToCongratsView = true
+                    }
+                }
             }
         }
+
         .navigationDestination(isPresented: $navigateToCongratsView) {
             CongratsView(avatarType: "female")
         }
+        .toolbarTitleDisplayMode(.inline)  
     }
+    
 }
 
 #Preview {

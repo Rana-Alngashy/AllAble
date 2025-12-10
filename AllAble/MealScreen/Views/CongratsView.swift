@@ -26,7 +26,7 @@ struct CongratsView: View {
     let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
     
     @Environment(\.horizontalSizeClass) private var hSize
-      private var isCompact: Bool { hSize == .compact }   // iPhone
+    private var isCompact: Bool { true}     // iPhone
           var avatarImageName: String {
         // NOTE: These images must exist in your project's assets
         return avatarType == "male" ? "male_avatar_achievement" : "AvatarGirl"
