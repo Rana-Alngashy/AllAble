@@ -65,7 +65,7 @@ struct OptionView: View {
                 goToHome = true
                 
             }) {
-                Text("Button.Skip")
+                Text("Skip")
                     .font(isCompact ? .title3 : .title2)
                     .bold()
                     .foregroundColor(.black) // Changed from gray to black for visibility
