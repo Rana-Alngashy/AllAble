@@ -1,4 +1,3 @@
-
 //
 //  CalculateView.swift
 //  AllAble
@@ -10,15 +9,15 @@ import SwiftUI
 struct CalculateView: View {
     @EnvironmentObject var router: NotificationRouter
     
-    // 1. Connect to the History Store
+    // We still need the store in the environment, but we won't use it here anymore
     @EnvironmentObject var historyStore: HistoryStore
     
     @AppStorage("Account.CarbValue") private var storedCarbRatio: String = ""
     
     // MARK: - Properties
     let totalCarbs: Int
-    let mealName: String // ✅ تم استقباله
-    let mealType: String // ✅ تم استقباله
+    let mealName: String
+    let mealType: String
     
     @State private var navigateToOptionView = false
     
@@ -32,7 +31,7 @@ struct CalculateView: View {
     var insulinDose: Double {
         guard totalCarbs > 0 && carbRatio > 0 else { return 0.0 }
         let calculatedValue = Double(totalCarbs) / carbRatio
-        // التقريب لأقرب قيمة صحيحة
+        // Rounding to nearest integer
         return round(calculatedValue)
     }
 
@@ -41,13 +40,14 @@ struct CalculateView: View {
             VStack {
                 VStack(spacing: 30) {
                     
-                    Text("Title.InsulinDose")                        .font(.system(size: 34, weight: .bold))
+                    Text("Title.InsulinDose")
+                        .font(.system(size: 34, weight: .bold))
                         .padding(.top, 40)
                     
                     // ————— DETAILS BAR —————
                     HStack(spacing: 20) {
                         InfoCard(title: NSLocalizedString("TotalCarbs", comment: ""), value: "\(totalCarbs)g", icon: "fork.knife")
-                                                InfoCard(title: NSLocalizedString("Label.CarbRatio", comment: ""), value: "1 : \(Int(carbRatio))", icon: "drop.fill")
+                        InfoCard(title: NSLocalizedString("Label.CarbRatio", comment: ""), value: "1 : \(Int(carbRatio))", icon: "drop.fill")
                         
                     }
                     .padding(.horizontal, 40)
@@ -78,21 +78,15 @@ struct CalculateView: View {
                     
                     Spacer()
                     
-                    // ————— CONTINUE BUTTON (SAVE ACTION) —————
+                    // ————— CONTINUE BUTTON —————
                     Button(action: {
-                        // 2. حفظ الوجبة في السجل قبل المتابعة
-                        let newEntry = HistoryEntry(
-                            mealTypeTitle: mealType,
-                            mealName: mealName.isEmpty ? mealType : mealName, // استخدم نوع الوجبة كاسم افتراضي
-                            totalCarbs: Double(totalCarbs),
-                            insulinDose: insulinDose
-                        )
-                        historyStore.addEntry(newEntry)
+                        // ❌ DELETED: historyStore.addEntry(...)
+                        // We do NOT save here anymore. We just move to the next screen.
                         
-                        // Navigate
                         navigateToOptionView = true
                     }) {
-                        Text("Button.Continue")                            .font(.title3.bold())
+                        Text("Button.Continue")
+                            .font(.title3.bold())
                             .foregroundColor(.black)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 15)
@@ -112,14 +106,22 @@ struct CalculateView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(customBackground.ignoresSafeArea())
+            
+            // ————— PASS DATA TO OPTION VIEW —————
             .navigationDestination(isPresented: $navigateToOptionView) {
-                OptionView()
+                // ⭐ This is the critical part: Pass the data forward!
+                OptionView(
+                    mealType: mealType,
+                    mealName: mealName.isEmpty ? mealType : mealName,
+                    carbs: Double(totalCarbs),
+                    dose: insulinDose
+                )
             }
         }
     }
 }
 
-// 🔥 تم إخراج Helper view خارج هيكل CalculateView
+// Helper View
 struct InfoCard: View {
     let title: String
     let value: String

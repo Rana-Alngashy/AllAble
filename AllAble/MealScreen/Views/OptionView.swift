@@ -9,16 +9,25 @@ import SwiftUI
 struct OptionView: View {
     
     @EnvironmentObject var router: NotificationRouter
-    
-    @State private var navigateToReminderView = false
-    @State private var navigateToTimerView = false
     @EnvironmentObject var historyStore: HistoryStore
+    @Environment(\.dismiss) private var dismiss // Helper to close view
+    
+    // MARK: - Navigation States
+    @State private var navigateToTimerView = false
+    @State private var goToHome = false // ⭐ Force Home Trigger
+    
+    // MARK: - Incoming Data
+    var mealType: String = ""
+    var mealName: String = ""
+    var carbs: Double = 0.0
+    var dose: Double = 0.0
 
     let customYellow = Color(red: 0.99, green: 0.85, blue: 0.33)
     let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
 
     @Environment(\.horizontalSizeClass) private var hSize
-    private var isCompact: Bool { true}  
+    private var isCompact: Bool { true }
+    
     var body: some View {
         VStack(spacing: isCompact ? 30 : 50) {
             
@@ -46,21 +55,25 @@ struct OptionView: View {
             }
             
             
-            // ————— NO, SET REMINDER BUTTON —————
+            // ————— SKIP BUTTON (Go Home) —————
             Button(action: {
-                navigateToReminderView = true     // <<⭐ الآن يفعل fullScreenCover
+                // 1. Try to clear standard path
+                router.navigationPath = NavigationPath()
+                router.shouldNavigateToOptionView = false
+                
+                // 2. ⭐ Force Navigation to Home
+                goToHome = true
+                
             }) {
-                Text("Button.NoReminder")
+                Text("Button.Skip")
                     .font(isCompact ? .title3 : .title2)
                     .bold()
-                    .foregroundColor(.black)
+                    .foregroundColor(.black) // Changed from gray to black for visibility
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, isCompact ? 18 : 25)
-                    .background(Color.white)
-                    .cornerRadius(14)
                     .overlay(
                         RoundedRectangle(cornerRadius: 14)
-                            .stroke(Color.gray, lineWidth: 1)
+                            .stroke(Color.black.opacity(1), lineWidth: 1.5)
                     )
             }
             
@@ -69,28 +82,40 @@ struct OptionView: View {
         .padding(.horizontal, isCompact ? 20 : 50)
         .background(customBackground.ignoresSafeArea())
         
+        // ————— NAVIGATION —————
         
-        // ————— NAVIGATION DESTINATIONS —————
-        
+        // 1. To Timer
         .navigationDestination(isPresented: $navigateToTimerView) {
-            TimerView()
+            TimerView(
+                mealType: mealType,
+                mealName: mealName,
+                carbs: carbs,
+                dose: dose
+            )
         }
         
-        
-        // ⭐⭐ Full Screen Reminder (الأفضل هنا)
-        .fullScreenCover(isPresented: $navigateToReminderView) {
-            ReminderView()
+        // 2. ⭐ Force Go Home (The fix)
+        .fullScreenCover(isPresented: $goToHome) {
+            MainPage()
                 .environmentObject(router)
                 .environmentObject(historyStore)
         }
-
-        .toolbarTitleDisplayMode(.inline)   // ← هنا المكان الصحيح
-
+        
+        .toolbarTitleDisplayMode(.inline)
+        // If presented via sheet/cover, this helps remove it too
+        .onChange(of: goToHome) { newValue in
+            if newValue {
+                // small delay to ensure UI updates before switching
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    router.shouldNavigateToOptionView = false
+                }
+            }
+        }
     }
 }
-
 
 #Preview {
     OptionView()
         .environmentObject(NotificationRouter())
+        .environmentObject(HistoryStore())
 }
