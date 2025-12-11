@@ -1,4 +1,3 @@
-
 //
 //  EditMealView.swift
 //  AllAble
@@ -114,11 +113,14 @@ struct EditMealView: View {
                 CalculateView(
                     totalCarbs: viewModel.totalCarbs,
                     mealName: viewModel.mealName.isEmpty ? meal.title : viewModel.mealName,
-                    mealType: meal.title
+                    mealType: meal.title,
+                    mainMealCarbs: Double(Int(viewModel.mealCarbs) ?? 0),   // ← تمرير كارب الوجبة الرئيسية
+                    subItems: viewModel.subItems                             // ← تمرير العناصر الفرعية
                 )
             }
         }
         .toolbarTitleDisplayMode(.inline)
-        .environment(\.layoutDirection, .leftToRight)   // ←←✨ أهم شيء: إجبار اليسار حتى لو الجهاز عربي
+        .environment(\.layoutDirection, .leftToRight)
     }
 }
+

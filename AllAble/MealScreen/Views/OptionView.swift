@@ -21,6 +21,10 @@ struct OptionView: View {
     var mealName: String = ""
     var carbs: Double = 0.0
     var dose: Double = 0.0
+    
+    // NEW
+    var mainMealCarbs: Double = 0.0
+    var subItems: [MealSubItem] = []
 
     let customYellow = Color(red: 0.99, green: 0.85, blue: 0.33)
     let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
@@ -57,18 +61,14 @@ struct OptionView: View {
             
             // ————— SKIP BUTTON (Go Home) —————
             Button(action: {
-                // 1. Try to clear standard path
                 router.navigationPath = NavigationPath()
                 router.shouldNavigateToOptionView = false
-                
-                // 2. ⭐ Force Navigation to Home
                 goToHome = true
-                
             }) {
                 Text("Skip")
                     .font(isCompact ? .title3 : .title2)
                     .bold()
-                    .foregroundColor(.black) // Changed from gray to black for visibility
+                    .foregroundColor(.black)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, isCompact ? 18 : 25)
                     .overlay(
@@ -90,7 +90,9 @@ struct OptionView: View {
                 mealType: mealType,
                 mealName: mealName,
                 carbs: carbs,
-                dose: dose
+                dose: dose,
+                mainMealCarbs: mainMealCarbs,
+                subItems: subItems
             )
         }
         
@@ -102,10 +104,8 @@ struct OptionView: View {
         }
         
         .toolbarTitleDisplayMode(.inline)
-        // If presented via sheet/cover, this helps remove it too
         .onChange(of: goToHome) { newValue in
             if newValue {
-                // small delay to ensure UI updates before switching
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     router.shouldNavigateToOptionView = false
                 }
@@ -119,3 +119,4 @@ struct OptionView: View {
         .environmentObject(NotificationRouter())
         .environmentObject(HistoryStore())
 }
+

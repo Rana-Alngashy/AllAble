@@ -34,6 +34,8 @@ class HistoryViewModel: ObservableObject {
         let newEntry = HistoryEntry(
             mealTypeTitle: type,
             mealName: name,
+            mainMealCarbs: carbs,
+            subItems: [],
             totalCarbs: carbs,
             insulinDose: dose
         )

@@ -19,6 +19,10 @@ struct CalculateView: View {
     let mealName: String
     let mealType: String
     
+    // NEW: pass details for history
+    let mainMealCarbs: Double
+    let subItems: [MealSubItem]
+    
     @State private var navigateToOptionView = false
     
     let circleMaxSize: CGFloat = 300
@@ -31,7 +35,6 @@ struct CalculateView: View {
     var insulinDose: Double {
         guard totalCarbs > 0 && carbRatio > 0 else { return 0.0 }
         let calculatedValue = Double(totalCarbs) / carbRatio
-        // Rounding to nearest integer
         return round(calculatedValue)
     }
 
@@ -80,9 +83,6 @@ struct CalculateView: View {
                     
                     // ————— CONTINUE BUTTON —————
                     Button(action: {
-                        // ❌ DELETED: historyStore.addEntry(...)
-                        // We do NOT save here anymore. We just move to the next screen.
-                        
                         navigateToOptionView = true
                     }) {
                         Text("Button.Continue")
@@ -109,12 +109,13 @@ struct CalculateView: View {
             
             // ————— PASS DATA TO OPTION VIEW —————
             .navigationDestination(isPresented: $navigateToOptionView) {
-                // ⭐ This is the critical part: Pass the data forward!
                 OptionView(
                     mealType: mealType,
                     mealName: mealName.isEmpty ? mealType : mealName,
                     carbs: Double(totalCarbs),
-                    dose: insulinDose
+                    dose: insulinDose,
+                    mainMealCarbs: mainMealCarbs,
+                    subItems: subItems
                 )
             }
         }
@@ -145,3 +146,4 @@ struct InfoCard: View {
         .shadow(color: .black.opacity(0.05), radius: 3, x: 0, y: 2)
     }
 }
+

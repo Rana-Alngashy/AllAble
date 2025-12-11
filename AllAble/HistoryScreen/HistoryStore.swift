@@ -13,8 +13,11 @@ struct HistoryEntry: Identifiable {
     let id = UUID()
     let mealTypeTitle: String
     let mealName: String
+    let mainMealCarbs: Double          // ← كارب الوجبة الرئيسية
+    let subItems: [MealSubItem]        // ← العناصر الفرعية مع كارب كل واحد
     let totalCarbs: Double
     let insulinDose: Double
+    let date: Date = Date()            // ← التاريخ الافتراضي (وقت الحفظ)
 }
 
 // 2. The Store Class

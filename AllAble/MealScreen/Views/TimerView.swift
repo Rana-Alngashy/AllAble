@@ -20,6 +20,10 @@ struct TimerView: View {
     var carbs: Double = 0.0
     var dose: Double = 0.0
     
+    // NEW
+    var mainMealCarbs: Double = 0.0
+    var subItems: [MealSubItem] = []
+    
     // MARK: - State Properties
     @State private var selectedHours = 0
     @State private var selectedMinutes = 15
@@ -187,7 +191,6 @@ struct TimerView: View {
     func startTimer() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
         
-        // Calculate total seconds from H, M, and S
         let totalSeconds = (selectedHours * 3600) + (selectedMinutes * 60) + selectedSeconds
         
         if totalSeconds > 0 {
@@ -245,6 +248,8 @@ struct TimerView: View {
             let entry = HistoryEntry(
                 mealTypeTitle: mealType,
                 mealName: mealName,
+                mainMealCarbs: mainMealCarbs,
+                subItems: subItems,
                 totalCarbs: carbs,
                 insulinDose: dose
             )
@@ -285,3 +290,4 @@ struct TimerView: View {
     TimerView()
         .environmentObject(HistoryStore())
 }
+
