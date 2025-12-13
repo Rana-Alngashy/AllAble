@@ -1,11 +1,11 @@
 //
+//
 //  InfoView.swift
 //  AllAble
 //
 //  Created by Wteen Alghamdy on 15/06/1447 AH.
 //
 //
-
 import SwiftUI
 
 struct InfoView: View {
@@ -17,6 +17,7 @@ struct InfoView: View {
     let primaryColor = Color(red: 0.99, green: 0.85, blue: 0.33)
     @EnvironmentObject var router: NotificationRouter
     @EnvironmentObject var historyStore: HistoryStore
+    @EnvironmentObject var carbRatioStore: CarbRatioStore // ✅ متاح
 
     @Environment(\.horizontalSizeClass) private var hSize
     private var isCompact: Bool { hSize == .compact }   // iPhone
@@ -41,86 +42,86 @@ struct InfoView: View {
             }
         }
 //        .environment(\.layoutDirection, .rightToLeft)
-        .fullScreenCover(isPresented: $viewModel.shouldNavigateToVerification) {
-            MainPage()
+        .fullScreenCover(isPresented: $viewModel.shouldNavigateToCarbRatio) { // ✅ الانتقال إلى CarbRatioPage
+            // ✅ الانتقال مباشرة إلى CarbRatioPage في وضع Onboarding
+            CarbRatioPage(store: carbRatioStore, isFirstTimeOnboarding: true)
                 .environmentObject(router)
                 .environmentObject(historyStore)
+                .environmentObject(carbRatioStore)
         }
 
         .toolbarTitleDisplayMode(.inline) }
     
-    // MARK: - Form Section
+    // MARK: - Sub Views
     
-    private var formSection: some View {
-        VStack(alignment: .leading, spacing: isCompact ? 20 : 30) {
-            
+    private var avatarSection: some View {
+        VStack {
+            ZStack {
+
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: isCompact ? 200 : 350, height: isCompact ? 200 : 350)
+                    .shadow(color: .gray.opacity(0.3), radius: 5, x: 0, y: 3)
+
+                // 🔥 عرض الأفاتار باستخدام الاسم المخزن 🔥
+                Image(selectedAvatar .imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(
+                        width: isCompact ? 180 : 320,
+                        height: isCompact ? 180 : 320
+                    )
+            }
+                
+            // Title
             Text("Title.UserInfo")
                 .font(isCompact ? .title2 : .largeTitle)
                 .bold()
                 .foregroundColor(.gray)
-                .padding(.top, isCompact ? 10 : 50)
-            
-            InfoInputField(
-                title: "Account.Name",                text: $viewModel.name,
-                brandBlueColor: brandBlueColor,
-                isCompact: isCompact
-            )
-            
-            InfoInputField(
-                title: "Account.Age",                text: $viewModel.age,
-                brandBlueColor: brandBlueColor,
-                isCompact: isCompact
-            )
-            .keyboardType(.numberPad)
-            
-            CarbValueInputField(
-                title: "Account.CarbValue",
-                text: $viewModel.carbValue,
-                isExplanationVisible: $viewModel.isCarbExplanationVisible,
-                toggleAction: viewModel.toggleCarbExplanation,
-                brandBlueColor: brandBlueColor,
-                isCompact: isCompact
-            )
-            .keyboardType(.numberPad)
-            
-            if viewModel.isCarbExplanationVisible {
-                Text("Explanation.CarbValue")                    .font(.callout)
-                    .foregroundColor(brandBlueColor)
-                    .padding(.horizontal, 12)
-            }
-
-            Spacer(minLength: isCompact ? 20 : 40)
-            
-            Button(action: viewModel.handleNext) {
-                Text("Button.Next")
-                    .font(isCompact ? .title3 : .title2)
-                    .bold()
-                    .frame(maxWidth: .infinity)
-                    .frame(height: isCompact ? 50 : 60)
-                    .background(viewModel.isNextButtonEnabled ? primaryColor : Color.gray.opacity(0.3))
-                    .foregroundColor(viewModel.isNextButtonEnabled ? .black : .white)
-                    .cornerRadius(15)
-            }
-            .disabled(!viewModel.isNextButtonEnabled)
-            .padding(.bottom, isCompact ? 20 : 50)
-            .toolbarTitleDisplayMode(.inline)
-
+                .padding(.top, isCompact ? 10 : 20)
         }
     }
     
-    // MARK: - Avatar Section
-    
-    private var avatarSection: some View {
-        Image(selectedAvatar.imageName)
-            .resizable()
-            .scaledToFit()
-            .frame(
-                width: isCompact ? 200 : 400,
-                height: isCompact ? 260 : 500
+    private var formSection: some View {
+        VStack(spacing: 20) {
+            // حقل الاسم
+            InfoInputField(
+                title: NSLocalizedString("Account.Name", comment: ""),
+                text: $viewModel.name,
+                brandBlueColor: brandBlueColor,
+                isCompact: isCompact
             )
+
+            // حقل العمر
+            InfoInputField(
+                title: NSLocalizedString("Account.Age", comment: ""),
+                text: $viewModel.age,
+                brandBlueColor: brandBlueColor,
+                isCompact: isCompact
+            )
+            .keyboardType(.numberPad)
+            
+            // ————— NEXT BUTTON —————
+            Button(action: viewModel.handleNext) {
+                Text("Button.Next")
+                    .font(isCompact ? .body : .title3)
+                    .bold()
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: isCompact ? 56 : 85)
+                    .background(viewModel.isNextButtonEnabled ? primaryColor : Color.gray.opacity(0.3))
+                    .cornerRadius(16)
+            }
+            .disabled(!viewModel.isNextButtonEnabled)
+            .padding(.top, isCompact ? 10 : 30)
+        }
+        .padding(.horizontal, isCompact ? 0 : 40)
+        .padding(.bottom, isCompact ? 40 : 80)
     }
     
-    // MARK: - Helper Views
+    
+    // MARK: - Helper Structs
+    
     struct InfoInputField: View {
         let title: String
         @Binding var text: String
@@ -128,18 +129,16 @@ struct InfoView: View {
         let isCompact: Bool
         
         var body: some View {
-            VStack(alignment: .leading, spacing: 8) {
-                
-                Text(LocalizedStringKey(title))
-                    .font(isCompact ? .body : .title2)
-                    .bold()
+            VStack(alignment: .leading, spacing: 6) {
+                Text(title)
+                    .font(.callout.bold())
                     .foregroundColor(brandBlueColor)
-                    .padding(.leading, 6)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 
                 TextField("", text: $text)
                     .font(.body)
                     .foregroundColor(.black)
-                    .padding(12)                             // بدل horizontal padding
+                    .padding(12)
                     .background(Color.white)
                     .cornerRadius(16)
                     .overlay(
@@ -147,35 +146,23 @@ struct InfoView: View {
                             .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                     )
                     .multilineTextAlignment(.leading)
-                    .frame(minHeight: 50)                    // بدل frame الثابت
+                    .frame(minHeight: 50)
             }
         }
     }
-
+}
+// MARK: - Preview
+#Preview {
+    // 1. تحديد Avatar وهمي (يجب أن يكون اسم الصورة موجوداً لديك)
+    let mockAvatar = Avatar(name: "Mock Girl", imageName: "AvatarGirl")
     
-    struct CarbValueInputField: View {
-        let title: String
-        @Binding var text: String
-        @Binding var isExplanationVisible: Bool
-        let toggleAction: () -> Void
-        let brandBlueColor: Color
-        let isCompact: Bool
-        
-        var body: some View {
-            HStack(spacing: 10) {
-                InfoInputField(
-                    title: title,
-                    text: $text,
-                    brandBlueColor: brandBlueColor,
-                    isCompact: isCompact
-                )
-                
-                Button(action: toggleAction) {
-                    Image(systemName: "questionmark.circle.fill")
-                        .foregroundColor(brandBlueColor)
-                        .font(isCompact ? .title3 : .title2)
-                }
-            }
-        }
+    // 2. تغليف العرض بـ NavigationStack لدعم الـ toolbar
+    NavigationStack {
+        InfoView(selectedAvatar: mockAvatar)
+            // 3. توفير كائنات البيئة المطلوبة
+            .environmentObject(NotificationRouter())
+            .environmentObject(HistoryStore())
+            .environmentObject(CarbRatioStore())   // توفير المخزن
+//            .environment(\.layoutDirection, .rightToLeft) // إذا كان التطبيق يعتمد على RTL
     }
 }

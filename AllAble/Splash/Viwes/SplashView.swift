@@ -11,7 +11,8 @@ struct SplashView: View {
     @StateObject var viewModel = SplashViewModel()
     @EnvironmentObject var router: NotificationRouter
     @EnvironmentObject var historyStore: HistoryStore
-
+    @EnvironmentObject var carbRatioStore: CarbRatioStore // ✅ إضافة CarbRatioStore
+    
     @State private var animate = false
     
     let backgroundColor = Color(#colorLiteral(red: 0.992, green: 0.863, blue: 0.345, alpha: 1))
@@ -44,6 +45,7 @@ struct SplashView: View {
             AvatarSelectionView()
                 .environmentObject(router)        // ← مهم جدًا
                 .environmentObject(historyStore)  // ← مهم جدًا
+                .environmentObject(carbRatioStore) // ✅ تمرير CarbRatioStore
         }
     }
 }

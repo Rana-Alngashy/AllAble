@@ -1,3 +1,5 @@
+
+//
 //
 //  MainPageViewModel.swift
 //  AllAble
@@ -12,6 +14,9 @@ class MainPageViewModel: ObservableObject {
     
     @Published var userName: String = "ساره"    // يتغير حسب اللي يدخله اليوزر
     @Published var lastDose: Int = 6            // جرعة افتراضية
+    
+    // ✅ جديد: متغير للتحكم في الانتقال لصفحة الكارب (fullScreenCover)
+    @Published var shouldNavigateToCarbRatio = false
     
     func calculateMeal() {
         print("Go to calculate meal screen")

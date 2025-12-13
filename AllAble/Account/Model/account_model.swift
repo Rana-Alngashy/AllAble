@@ -10,6 +10,4 @@ import Foundation
 struct AccountModel {
     var name: String
     var age: String
-    var guardianNumber: String
-    var carbonValue: String
 }
