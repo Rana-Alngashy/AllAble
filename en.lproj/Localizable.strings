@@ -135,7 +135,7 @@
 
 
 // MARK: - Main Page & Navigation
-
+"Button.Done" = "Done";
 "Button.Save" = "Save";
 "Button.Next" = "NEXT";
 "LastDose.Title" = "Last insulin dose calculation";
