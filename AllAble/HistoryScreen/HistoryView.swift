@@ -224,7 +224,8 @@ private struct HistoryDetailSheet: View {
     // نجعل خلفية الشيت نفس خلفية الشاشة الرئيسية
     private let sheetBackground = Color(red: 0.98, green: 0.96, blue: 0.90)
     private let cardStroke = Color.gray.opacity(0.35)
-    private let titleColor = Color.gray.opacity(0.7)
+    // العناوين والنصوص خارج المستطيلات البيضاء تكون سوداء
+    private let titleColor = Color.black.opacity(0.9)
     
     var body: some View {
         VStack(spacing: 18) {
@@ -235,7 +236,7 @@ private struct HistoryDetailSheet: View {
                 Spacer()
                 
                 Text(localizedType(entry.mealTypeTitle))
-                    .foregroundColor(titleColor)
+                    .foregroundColor(titleColor) // أسود
                     .font(isCompact ? .title3 : .title2)
                     .fontWeight(.semibold)
                 
@@ -250,7 +251,7 @@ private struct HistoryDetailSheet: View {
             // الحقل الرئيسي (اسم + كارب الوجبة)
             InputGroup {
                 LabeledField(title: "Name of the meal:", value: entry.mealName)
-                Divider().overlay(cardStroke)
+                Divider().overlay(Color.black.opacity(0.2))
                 LabeledField(title: "Main Meal Carbs :", value: entry.mainMealCarbs > 0 ? "\(Int(entry.mainMealCarbs))" : "-")
             }
             
@@ -260,7 +261,7 @@ private struct HistoryDetailSheet: View {
                 HStack {
                     Text("Subitems")
                         .font(isCompact ? .title3 : .title2)
-                        .foregroundColor(titleColor)
+                        .foregroundColor(titleColor) // أسود
                         .fontWeight(.semibold)
                     Spacer()
                 }
@@ -271,7 +272,7 @@ private struct HistoryDetailSheet: View {
                     ForEach(entry.subItems) { item in
                         InputGroup {
                             LabeledField(title: "Name of the meal:", value: item.name.isEmpty ? "-" : item.name)
-                            Divider().overlay(cardStroke)
+                            Divider().overlay(Color.black.opacity(0.2))
                             LabeledField(title: "Carbs :", value: "\(Int(item.carbs) ?? 0)")
                         }
                     }
@@ -328,10 +329,10 @@ private struct HistoryDetailSheet: View {
             Button(action: action) {
                 ZStack {
                     Circle()
-                        .stroke(Color.gray.opacity(0.5), lineWidth: 2)
+                        .stroke(Color.black, lineWidth: 2) // حدود دائرية سوداء
                         .frame(width: 36, height: 36)
                     Image(systemName: systemName)
-                        .foregroundColor(.gray.opacity(0.7))
+                        .foregroundColor(.black) // أيقونة سوداء
                         .font(.system(size: 16, weight: .semibold))
                 }
             }
@@ -350,7 +351,7 @@ private struct HistoryDetailSheet: View {
                         .fill(Color.white)
                         .overlay(
                             RoundedRectangle(cornerRadius: 22)
-                                .stroke(Color.gray.opacity(0.5), lineWidth: 1)
+                                .stroke(Color.black, lineWidth: 1) // حدود سوداء
                         )
                         .shadow(color: .black.opacity(0.06), radius: 4, x: 0, y: 2)
                 )
@@ -381,7 +382,7 @@ private struct HistoryDetailSheet: View {
         var body: some View {
             VStack(alignment: .leading, spacing: 10) {
                 Text(title)
-                    .foregroundColor(.gray.opacity(0.75))
+                    .foregroundColor(.black.opacity(0.9)) // عنوان خارج المستطيل الأبيض → أسود
                     .font(.callout)
                 
                 Text(value.isEmpty ? "-" : value)
@@ -395,7 +396,7 @@ private struct HistoryDetailSheet: View {
                             .fill(Color.white)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 26)
-                                    .stroke(Color.gray.opacity(0.45), lineWidth: 1)
+                                    .stroke(Color.black, lineWidth: 1) // حدود سوداء
                             )
                             .shadow(color: .black.opacity(0.06), radius: 5, x: 0, y: 2)
                     )
