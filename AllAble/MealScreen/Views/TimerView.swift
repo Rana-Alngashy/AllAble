@@ -57,7 +57,7 @@ struct TimerView: View {
                 VStack(spacing: 20) {
                     
                     // ————— TITLE —————
-                    Text(isTimerActive ? "Title.TimerRunning" : "Set Timer")
+                    Text(isTimerActive ? "Timer" : "Set Timer")
                         .font(isCompact ? .title2 : .largeTitle)
                         .bold()
                         .padding(.top, isCompact ? 20 : 40)
