@@ -8,7 +8,6 @@
 // CongratsView.swift
 // CongratsView.swift
 
-
 import SwiftUI
 
 struct CongratsView: View {
@@ -26,8 +25,9 @@ struct CongratsView: View {
     let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
     
     @Environment(\.horizontalSizeClass) private var hSize
-    private var isCompact: Bool { true}     // iPhone
-          var avatarImageName: String {
+    private var isCompact: Bool { true }     // iPhone
+    
+    var avatarImageName: String {
         // NOTE: These images must exist in your project's assets
         return avatarType == "male" ? "male_avatar_achievement" : "AvatarGirl"
     }
@@ -63,21 +63,38 @@ struct CongratsView: View {
             
             Spacer()
             
+            // ————— DONE BUTTON —————
+            Button {
+                navigateToMainPage = true
+            } label: {
+                Text("Done")
+                    .font(.title3.bold())
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 18)
+                    .background(customYellow)
+                    .cornerRadius(14)
+                    .padding(.horizontal, 40)
+            }
             
-            
-            // 🛑 CRITICAL FIX: Reverting to the working NavigationLink structure
-            // This link is pushed onto the stack after 2 seconds.
-            NavigationLink(destination: MainPage().environmentObject(NotificationRouter()), isActive: $navigateToMainPage) {
+            // Hidden NavigationLink to MainPage
+            NavigationLink(
+                destination: MainPage()
+                    .environmentObject(NotificationRouter()),
+                isActive: $navigateToMainPage
+            ) {
                 EmptyView()
             }
             .hidden()
-
-            // REMOVED the "Done" button as requested
+            
+            // Bottom spacing
+            Spacer().frame(height: isCompact ? 20 : 40)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(customBackground.ignoresSafeArea())
         .navigationBarHidden(true)
         .onAppear {
+            // Keep automatic navigation after 2 seconds (optional)
             Task {
                 try await Task.sleep(nanoseconds: 2_000_000_000)
                 navigateToMainPage = true

@@ -13,14 +13,14 @@ struct HistoryView: View {
     @Environment(\.horizontalSizeClass) private var hSize
     @Environment(\.layoutDirection) var layoutDirection
     
-    private var isCompact: Bool { true}
+    private var isCompact: Bool { true }
     private var isArabic: Bool { layoutDirection == .rightToLeft }
     
+    // خلفية عامة بيج فاتح
     private let pageBackground = Color(red: 0.98, green: 0.96, blue: 0.90)
     
-    // MARK: - Popup State
+    // MARK: - Sheet State
     @State private var selectedEntry: HistoryEntry?
-    @State private var showPopup: Bool = false
     
     var body: some View {
         ZStack {
@@ -62,20 +62,17 @@ struct HistoryView: View {
                 } else {
                     
                     ScrollView {
-                        VStack(spacing: 20) {
+                        VStack(spacing: 16) {
                             ForEach(viewModel.entries.reversed()) { entry in
                                 MealLargeCard(
                                     type: localizedType(entry.mealTypeTitle),
                                     imageName: fallbackImageName(for: entry.mealTypeTitle),
-                                    background: backgroundColor(for: entry.mealTypeTitle),
+                                    background: backgroundColor(for: entry.mealTypeTitle), // ← لون حسب النوع
                                     date: entry.date,
                                     isCompact: isCompact
                                 )
                                 .onTapGesture {
                                     selectedEntry = entry
-                                    withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
-                                        showPopup = true
-                                    }
                                 }
                                 .accessibilityAddTraits(.isButton)
                                 .accessibilityLabel(localizedType(entry.mealTypeTitle))
@@ -87,28 +84,19 @@ struct HistoryView: View {
                 }
             }
             .toolbarTitleDisplayMode(.inline)
-            
-            // ————— POPUP OVERLAY —————
-            if showPopup, let entry = selectedEntry {
-                PopupDetailView(
-                    entry: entry,
-                    isArabic: isArabic,
-                    isCompact: isCompact,
-                    backgroundForType: backgroundColor(for:),
-                    onClose: {
-                        withAnimation(.easeOut(duration: 0.2)) {
-                            showPopup = false
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                            selectedEntry = nil
-                        }
-                    }
-                )
-                .transition(.opacity.combined(with: .scale))
-            }
         }
         .navigationBarHidden(false)
-
+        // ————— SHEET PRESENTATION —————
+        .sheet(item: $selectedEntry) { entry in
+            HistoryDetailSheet(
+                entry: entry,
+                isArabic: isArabic,
+                isCompact: isCompact,
+                onClose: { selectedEntry = nil }
+            )
+            .presentationDetents([.large]) // يبدأ الشيت من الأعلى
+            .presentationDragIndicator(.hidden) // لإخفاء مؤشر السحب
+        }
     }
     
     // MARK: - Helpers
@@ -141,23 +129,16 @@ struct HistoryView: View {
     private func backgroundColor(for type: String) -> Color {
         switch type.lowercased() {
         case "breakfast", "فطور":
-            return Color(red: 1.00, green: 0.98, blue: 0.80)
+            return Color(#colorLiteral(red: 1.00, green: 0.98, blue: 0.80, alpha: 1))
         case "lunch", "غداء":
-            return Color(red: 0.90, green: 0.98, blue: 0.85)
+            return Color(#colorLiteral(red: 0.85, green: 1.00, blue: 0.85, alpha: 1))
         case "dinner", "عشاء":
-            return Color(red: 0.90, green: 0.98, blue: 0.95)
+            // طابق لون "Dinner" مع AddMealViewModel
+            return Color(#colorLiteral(red: 0.85, green: 0.95, blue: 1.00, alpha: 1))
         case "snacks", "سناكس":
             return Color(#colorLiteral(red: 1.00, green: 0.90, blue: 0.95, alpha: 1))
         default:
             return Color.white.opacity(0.9)
-        }
-    }
-    
-    private func formatDose(_ dose: Double) -> String {
-        if dose.rounded() == dose {
-            return String(format: "%.0f", dose)
-        } else {
-            return String(format: "%.1f", dose)
         }
     }
 }
@@ -172,48 +153,35 @@ private struct MealLargeCard: View {
     let date: Date
     let isCompact: Bool
     
-    // تنسيقات منفصلة للعرض تحت بعض
-    private var dateOnlyString: String {
+    private var dateTimeString: String {
         let formatter = DateFormatter()
         formatter.locale = Locale.autoupdatingCurrent
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .none
-        return formatter.string(from: date)
-    }
-    
-    private var timeOnlyString: String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale.autoupdatingCurrent
-        formatter.dateStyle = .none
-        formatter.timeStyle = .short
+        formatter.dateFormat = "MMM d, yyyy — h:mm a"
         return formatter.string(from: date)
     }
     
     var body: some View {
         ZStack {
-            // Background Card
-            RoundedRectangle(cornerRadius: 32)
-                .fill(background)
-                .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 5)
+            RoundedRectangle(cornerRadius: 24)
+                .fill(background) // ← لون حسب النوع
+                .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 32)
+                    RoundedRectangle(cornerRadius: 24)
                         .stroke(Color.white.opacity(0.6), lineWidth: 2)
                 )
-                .frame(height: isCompact ? 140 : 170)
+                .frame(height: isCompact ? 120 : 150)
             
             HStack(spacing: 12) {
                 
                 if isArabic { Spacer(minLength: 8) }
                 
-                // Meal Image (by type)
                 Image(imageName)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: isCompact ? 80 : 110,
-                           height: isCompact ? 80 : 110)
+                    .frame(width: isCompact ? 70 : 95,
+                           height: isCompact ? 70 : 95)
                     .padding(.horizontal, 6)
                 
-                // Content Stack: type + date (فوق) + time (تحت)
                 VStack(
                     alignment: isArabic ? .trailing : .leading,
                     spacing: 6
@@ -221,128 +189,112 @@ private struct MealLargeCard: View {
                     Text(type)
                         .font(isCompact ? .title3.bold() : .title2.bold())
                         .foregroundColor(.gray.opacity(0.85))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
                     
-                    VStack(alignment: isArabic ? .trailing : .leading, spacing: 0) {
-                        Text(dateOnlyString)   // التاريخ فوق
+                    HStack(spacing: 8) {
+                        Image(systemName: "calendar")
+                            .foregroundColor(.gray.opacity(0.7))
+                        Text(dateTimeString)
                             .font(isCompact ? .footnote : .callout)
                             .foregroundColor(.gray)
-                        Text(timeOnlyString)   // الساعة تحت
-                            .font(isCompact ? .footnote : .callout)
-                            .foregroundColor(.gray)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.85)
                     }
                 }
-                .padding(isArabic ? .trailing : .leading, 12)
+                .padding(isArabic ? .trailing : .leading, 8)
                 
                 if !isArabic { Spacer(minLength: 8) }
             }
-            .padding(.horizontal, 8)
+            .padding(.horizontal, 10)
         }
         .padding(.horizontal, 4)
     }
 }
 
-// MARK: - Popup Detail View
-private struct PopupDetailView: View {
+// MARK: - History Detail Sheet (خلفية الشيت فقط بدون بطاقة داخلية)
+private struct HistoryDetailSheet: View {
     let entry: HistoryEntry
     let isArabic: Bool
     let isCompact: Bool
-    let backgroundForType: (String) -> Color
     let onClose: () -> Void
     
-    @Environment(\.layoutDirection) var layoutDirection
+    @Environment(\.dismiss) private var dismiss
+    
+    // نجعل خلفية الشيت نفس خلفية الشاشة الرئيسية
+    private let sheetBackground = Color(red: 0.98, green: 0.96, blue: 0.90)
+    private let cardStroke = Color.gray.opacity(0.35)
+    private let titleColor = Color.gray.opacity(0.7)
     
     var body: some View {
-        ZStack {
-            // Dimmed background
-            Color.black.opacity(0.35)
-                .ignoresSafeArea()
-                .onTapGesture { onClose() }
+        VStack(spacing: 18) {
+            // صف العنوان مع زر الإغلاق "x" فقط
+            HStack {
+                CircleButton(systemName: "xmark", action: close)
+                
+                Spacer()
+                
+                Text(localizedType(entry.mealTypeTitle))
+                    .foregroundColor(titleColor)
+                    .font(isCompact ? .title3 : .title2)
+                    .fontWeight(.semibold)
+                
+                Spacer()
+                
+                // توازن بصري مكان زر الصح المحذوف
+                Spacer().frame(width: 36, height: 36)
+            }
+            .padding(.horizontal, 18)
+            .padding(.top, 14)
             
-            // Card
-            VStack(alignment: .leading, spacing: 16) {
+            // الحقل الرئيسي (اسم + كارب الوجبة)
+            InputGroup {
+                LabeledField(title: "Name of the meal:", value: entry.mealName)
+                Divider().overlay(cardStroke)
+                LabeledField(title: "Main Meal Carbs :", value: entry.mainMealCarbs > 0 ? "\(Int(entry.mainMealCarbs))" : "-")
+            }
+            
+            // لا تعرض قسم Subitems إلا إذا كانت هناك عناصر فرعية
+            if entry.subItems.isEmpty == false {
+                // عنوان Subitems
                 HStack {
-                    if isArabic { Spacer() }
-                    Text(localizedType(entry.mealTypeTitle))
-                        .font(isCompact ? .title3.bold() : .title.bold())
-                        .foregroundColor(.gray.opacity(0.9))
-                    if !isArabic { Spacer() }
-                    
-                    Button(action: onClose) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: isCompact ? 22 : 26))
-                            .foregroundColor(.gray.opacity(0.7))
-                            .accessibilityLabel(Text("Close"))
-                    }
+                    Text("Subitems")
+                        .font(isCompact ? .title3 : .title2)
+                        .foregroundColor(titleColor)
+                        .fontWeight(.semibold)
+                    Spacer()
                 }
+                .padding(.horizontal, 6)
                 
-                // تمت إزالة التاريخ والوقت من داخل الـ pop-up حسب طلبك
-                
-                // اسم الوجبة
-                infoRow(title: NSLocalizedString("MealCard.Name", comment: ""), value: entry.mealName)
-                
-                // كارب الوجبة الرئيسية (سطر مستقل تحت الاسم) — إن وُجد
-                if entry.mainMealCarbs > 0 {
-                    infoRow(title: NSLocalizedString("MainMealCarbs", comment: "Main meal carbs"), value: "\(Int(entry.mainMealCarbs))g")
-                }
-                
-                // قائمة الـ Sub Items
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(NSLocalizedString("Subitems", comment: "Sub Items"))
-                        .font(isCompact ? .callout.weight(.semibold) : .title3.weight(.semibold))
-                        .foregroundColor(.gray)
-                    if entry.subItems.isEmpty {
-                        Text(NSLocalizedString("NoSubitems", comment: "No sub items"))
-                            .font(isCompact ? .callout : .title3)
-                            .foregroundColor(.black.opacity(0.6))
-                    } else {
-                        ForEach(entry.subItems) { item in
-                            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                                Text("•")
-                                Text(item.name.isEmpty ? "-" : item.name)
-                                Spacer(minLength: 8)
-                                Text("\(Int(item.carbs))g")
-                                    .foregroundColor(.black.opacity(0.75))
-                            }
-                            .font(isCompact ? .callout : .title3)
-                            .foregroundColor(.black.opacity(0.85))
+                // مجموعة لكل عنصر فرعي
+                VStack(spacing: 12) {
+                    ForEach(entry.subItems) { item in
+                        InputGroup {
+                            LabeledField(title: "Name of the meal:", value: item.name.isEmpty ? "-" : item.name)
+                            Divider().overlay(cardStroke)
+                            LabeledField(title: "Carbs :", value: "\(Int(item.carbs) ?? 0)")
                         }
                     }
                 }
-                
-                // إجمالي الكارب
-                infoRow(title: NSLocalizedString("MealCard.Carb", comment: ""), value: "\(Int(entry.totalCarbs))g")
-                
-                // جرعة الإنسولين
-                infoRow(title: NSLocalizedString("MealCard.InsulinDose", comment: ""), value: formatDose(entry.insulinDose))
-                
             }
-            .padding(20)
-            .background(
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(backgroundForType(entry.mealTypeTitle)) // اللون حسب نوع الوجبة
-                    .shadow(color: .black.opacity(0.15), radius: 16, x: 0, y: 8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 24)
-                            .stroke(Color.white.opacity(0.6), lineWidth: 2)
-                    )
-            )
-            .padding(.horizontal, isCompact ? 24 : 48)
-            .transition(.opacity.combined(with: .scale))
+            
+            // حقول مفصولة بسيطة (Carbs, Insulin dose) مع وحدات
+            SimpleField(title: "Carbs:", value: "\(Int(entry.totalCarbs)) g")
+            SimpleField(title: "Insulin dose:", value: "\(formatDose(entry.insulinDose)) U")
+            
+            Spacer(minLength: 4)
         }
+        .padding(.top, 8)
+        .padding(.horizontal, 12)
+        .background(sheetBackground.ignoresSafeArea())
     }
     
-    private func infoRow(title: String, value: String) -> some View {
-        HStack(spacing: 8) {
-            Text(title)
-                .foregroundColor(.gray)
-                .font(isCompact ? .callout : .title3)
-            Text(value)
-                .font(isCompact ? .callout.weight(.semibold) : .title3.weight(.semibold))
-                .foregroundColor(.black.opacity(0.85))
-            Spacer(minLength: 0)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
+    private func close() {
+        dismiss()
+        onClose()
     }
+    
+    // MARK: - Subviews
     
     private func localizedType(_ type: String) -> String {
         switch type.lowercased() {
@@ -359,11 +311,96 @@ private struct PopupDetailView: View {
         }
     }
     
+    // تنسيق جرعة الإنسولين (عرض 3 كـ "3" و 3.5 كـ "3.5")
     private func formatDose(_ dose: Double) -> String {
-        if dose.rounded() == dose {
+        if dose.truncatingRemainder(dividingBy: 1) == 0 {
             return String(format: "%.0f", dose)
         } else {
             return String(format: "%.1f", dose)
+        }
+    }
+    
+    private struct CircleButton: View {
+        let systemName: String
+        let action: () -> Void
+        
+        var body: some View {
+            Button(action: action) {
+                ZStack {
+                    Circle()
+                        .stroke(Color.gray.opacity(0.5), lineWidth: 2)
+                        .frame(width: 36, height: 36)
+                    Image(systemName: systemName)
+                        .foregroundColor(.gray.opacity(0.7))
+                        .font(.system(size: 16, weight: .semibold))
+                }
+            }
+            .buttonStyle(.plain)
+        }
+    }
+    
+    private struct InputGroup<Content: View>: View {
+        @ViewBuilder var content: Content
+        
+        var body: some View {
+            VStack(spacing: 0) { content }
+                .padding(14)
+                .background(
+                    RoundedRectangle(cornerRadius: 22)
+                        .fill(Color.white)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 22)
+                                .stroke(Color.gray.opacity(0.5), lineWidth: 1)
+                        )
+                        .shadow(color: .black.opacity(0.06), radius: 4, x: 0, y: 2)
+                )
+                .padding(.horizontal, 6)
+        }
+    }
+    
+    private struct LabeledField: View {
+        let title: String
+        let value: String
+        
+        var body: some View {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(title)
+                    .foregroundColor(.gray.opacity(0.9))
+                    .font(.callout)
+                Text(value.isEmpty ? "-" : value)
+                    .foregroundColor(.black.opacity(0.8))
+                    .font(.callout.weight(.semibold))
+            }
+        }
+    }
+    
+    private struct SimpleField: View {
+        let title: String
+        let value: String
+        
+        var body: some View {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(title)
+                    .foregroundColor(.gray.opacity(0.75))
+                    .font(.callout)
+                
+                Text(value.isEmpty ? "-" : value)
+                    .foregroundColor(.black.opacity(0.8))
+                    .font(.callout.weight(.semibold))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 26)
+                            .fill(Color.white)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 26)
+                                    .stroke(Color.gray.opacity(0.45), lineWidth: 1)
+                            )
+                            .shadow(color: .black.opacity(0.06), radius: 5, x: 0, y: 2)
+                    )
+            }
+            .padding(.horizontal, 6)
         }
     }
 }
@@ -371,6 +408,5 @@ private struct PopupDetailView: View {
 #Preview {
     let store = HistoryStore()
     let viewModel = HistoryViewModel(store: store)
-    
     return HistoryView(viewModel: viewModel)
 }
