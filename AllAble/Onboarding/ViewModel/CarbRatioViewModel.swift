@@ -6,6 +6,7 @@
 //
 // CarbRatioViewModel.swift
 
+
 import Foundation
 import Combine
 import SwiftUI
@@ -50,8 +51,9 @@ final class CarbRatioViewModel: ObservableObject {
         guard let newValue = newValue, newValue > 0 else {
                     return
                 }
+        // ✅ هذا الجزء صحيح الآن بعد تعديل الـ Store
         var updatedEntry = store.defaultRatio
-                updatedEntry.ratio = newValue
-                store.updateRatio(updatedEntry)
-            }
+        updatedEntry.ratio = newValue
+        store.updateRatio(updatedEntry)
+    }
 }

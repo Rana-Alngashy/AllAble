@@ -4,6 +4,7 @@
 //
 //  Created by Wteen Alghamdy on 18/06/1447 AH.
 //
+// CarbRatioPage.swift
 
 import SwiftUI
 
@@ -112,7 +113,7 @@ struct CarbRatioPage: View {
                     .font(.body)
                     .foregroundColor(.gray)
 
-                // ✅ هنا يتم ربط الحقل مباشرة بقيمة النسبة الافتراضية القابلة للتعديل
+                // ✅ هذا الربط صحيح ويعتمد على أن defaultRatio في الـ Store أصبح @Published
                 TextField("", value: Binding(
                     get: { store.defaultRatio.ratio },
                     set: { viewModel.updateDefaultRatioValue(newValue: $0) }
@@ -174,8 +175,8 @@ struct CarbRatioPage: View {
                 .bold()
                 .foregroundColor(.black.opacity(0.8))
             
-            // تصفية النسبة الافتراضية
-            let customRatios = store.ratios.filter { $0.id != store.defaultRatio.id }
+            // ✅ يتم عرض النسب المخصصة المخزنة في قائمة 'ratios'
+            let customRatios = store.ratios
 
             if customRatios.isEmpty {
                 Text("No custom ratios added yet.")
@@ -266,10 +267,13 @@ struct CarbRatioPage: View {
                 
                 Spacer()
                 
-                Button(action: onDelete) {
-                    Image(systemName: "trash.fill")
-                        .foregroundColor(.red)
-                        .padding(8)
+                // التأكد من عدم إظهار زر الحذف للنسبة الافتراضية
+                if entry.id != CarbRatioEntry.defaultPrototype().id {
+                    Button(action: onDelete) {
+                        Image(systemName: "trash.fill")
+                            .foregroundColor(.red)
+                            .padding(8)
+                    }
                 }
             }
             .padding()
