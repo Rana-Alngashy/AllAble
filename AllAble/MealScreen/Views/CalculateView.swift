@@ -47,11 +47,11 @@ struct CalculateView: View {
         GeometryReader { geometry in
             VStack {
                 VStack(spacing: 30) {
-                    
-                    Text("Title.InsulinDose")
-                        .font(.system(size: geometry.size.width * (0.05 / 1.5), weight: .bold)) // Adjust font size relative to width
-                        .foregroundColor(.gray)
+                    Text("Your Insulin Dose")
+                        .font(.system(size: geometry.size.width * 0.05, weight: .bold)) // Increased the size factor from (0.05 / 1.5) to 0.05
+                        .foregroundColor(.black)
                         .padding(.top, 40)
+            // 🌟 MODIFIED CODE END 🌟
                     
                     // ————— DOSE DISPLAY —————
                     ZStack {
@@ -96,7 +96,7 @@ struct CalculateView: View {
                     Button(action: {
                         navigateToOptionView = true
                     }) {
-                        Text("Button.Continue")
+                        Text("Continue")
                             .font(.title3.bold())
                             .foregroundColor(.black)
                             .frame(maxWidth: .infinity)
