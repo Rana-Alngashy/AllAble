@@ -13,7 +13,6 @@ struct CarbRatioPage: View {
     @StateObject var viewModel: CarbRatioViewModel
     @Environment(\.dismiss) private var dismiss
     
-    // 🔥 لإغلاق الـ Onboarding والانتقال إلى MainPage
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
     let isFirstTimeOnboarding: Bool
 
@@ -22,9 +21,11 @@ struct CarbRatioPage: View {
     
     let customYellow = Color(red: 0.99, green: 0.85, blue: 0.33)
     let customBackground = Color(red: 0.97, green: 0.96, blue: 0.92)
+    
+    // ✅ الحل: String وسيط للإدخال
+    @State private var defaultRatioText: String = ""
 
     init(store: CarbRatioStore, isFirstTimeOnboarding: Bool) {
-        // نستخدم injected store للتهيئة
         _viewModel = StateObject(wrappedValue: CarbRatioViewModel(store: store))
         self.isFirstTimeOnboarding = isFirstTimeOnboarding
     }
@@ -34,23 +35,19 @@ struct CarbRatioPage: View {
             customBackground.ignoresSafeArea()
 
             VStack {
-                // ————— TITLE & DISMISS BUTTON —————
                 headerSection
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: isCompact ? 30 : 50) {
-                        
                         defaultRatioSection
                         addNewRatioSection
                         customRatiosList
-                        
                         Spacer()
                     }
                     .padding(.horizontal, isCompact ? 20 : 50)
                     .padding(.vertical, isCompact ? 10 : 30)
                 }
                 
-                // ————— زر المتابعة/الحفظ —————
                 Group {
                     if isFirstTimeOnboarding {
                         OnboardingNextButton
@@ -64,10 +61,13 @@ struct CarbRatioPage: View {
         }
         .navigationBarHidden(true)
         .environment(\.layoutDirection, .leftToRight)
+        .onAppear {
+            // تحميل القيمة الحالية كنص
+            defaultRatioText = String(format: "%.0f", store.defaultRatio.ratio)
+        }
     }
     
     // MARK: - Header
-    
     private var headerSection: some View {
         HStack {
             Button(action: { dismiss() }) {
@@ -83,48 +83,42 @@ struct CarbRatioPage: View {
                 .font(isCompact ? .title2 : .largeTitle)
                 .bold()
                 .foregroundColor(.black.opacity(0.8))
-                .multilineTextAlignment(.center)
 
             Spacer()
-            
-            Button(action: { }) {
-                Image(systemName: "xmark")
-                    .font(.title2)
-                    .foregroundColor(.clear)
-            }
-            .padding(.trailing, isCompact ? 20 : 50)
+
+            Image(systemName: "xmark")
+                .foregroundColor(.clear)
+                .padding(.trailing, isCompact ? 20 : 50)
         }
         .padding(.vertical, 10)
-        .background(Color.white.opacity(0.8).ignoresSafeArea(edges: .top))
+        .background(Color.white.opacity(0.8))
         .shadow(color: .gray.opacity(0.3), radius: 2, y: 1)
     }
 
-    // MARK: - Sections (Default Ratio, Add New, List)
-
+    // MARK: - Default Ratio
     private var defaultRatioSection: some View {
         VStack(alignment: .leading, spacing: 15) {
             Text(store.defaultRatio.name)
                 .font(isCompact ? .headline : .title2)
                 .bold()
-                .foregroundColor(.black.opacity(0.8))
 
             HStack {
                 Text("Ratio Value:")
-                    .font(.body)
                     .foregroundColor(.gray)
 
-                // ✅ هذا الربط صحيح ويعتمد على أن defaultRatio في الـ Store أصبح @Published
-                TextField("", value: Binding(
-                    get: { store.defaultRatio.ratio },
-                    set: { viewModel.updateDefaultRatioValue(newValue: $0) }
-                ), formatter: NumberFormatter())
+                TextField("", text: $defaultRatioText)
                     .keyboardType(.decimalPad)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .frame(maxWidth: 100)
                     .font(.body.bold())
-                
+                    .onChange(of: defaultRatioText) { newValue in
+                        // تحديث فقط إذا القيمة صالحة
+                        if let value = Double(newValue), value > 0 {
+                            viewModel.updateDefaultRatioValue(newValue: value)
+                        }
+                    }
+
                 Text("g/unit")
-                    .font(.body)
                     .foregroundColor(.gray)
 
                 Spacer()
@@ -136,22 +130,20 @@ struct CarbRatioPage: View {
         }
     }
 
+    // MARK: - Add New Ratio
     private var addNewRatioSection: some View {
         VStack(alignment: .leading, spacing: 15) {
             Text("Add New Ratio")
                 .font(isCompact ? .headline : .title2)
                 .bold()
-                .foregroundColor(.black.opacity(0.8))
             
             VStack(spacing: 15) {
-                InputField(label: NSLocalizedString("Label.RatioName", comment: ""), text: $viewModel.newRatioName)
-                
+                InputField(label: "Ratio Name", text: $viewModel.newRatioName)
                 InputField(label: "Ratio Value", text: $viewModel.newRatioValue)
                     .keyboardType(.decimalPad)
                 
                 Button(action: viewModel.addRatio) {
-                    Text("Button.Save")
-                        .font(isCompact ? .body : .title3)
+                    Text("Save")
                         .bold()
                         .foregroundColor(.black)
                         .frame(maxWidth: .infinity)
@@ -167,66 +159,50 @@ struct CarbRatioPage: View {
             .shadow(color: .black.opacity(0.05), radius: 3)
         }
     }
-    
+
+    // MARK: - Custom Ratios List
     private var customRatiosList: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Other Custom Ratios")
                 .font(isCompact ? .headline : .title2)
                 .bold()
-                .foregroundColor(.black.opacity(0.8))
             
-            // ✅ يتم عرض النسب المخصصة المخزنة في قائمة 'ratios'
-            let customRatios = store.ratios
-
-            if customRatios.isEmpty {
+            if store.ratios.isEmpty {
                 Text("No custom ratios added yet.")
                     .foregroundColor(.gray)
-                    .padding(.top, 5)
             } else {
-                ForEach(customRatios) { entry in
-                    RatioCardView(entry: entry, customYellow: customYellow) {
+                ForEach(store.ratios) { entry in
+                    RatioCardView(entry: entry, onDelete: {
                         viewModel.deleteRatio(entry: entry)
-                    }
+                    })
                 }
             }
         }
     }
 
-    // MARK: - Navigation Buttons
-    
+    // MARK: - Buttons
     private var OnboardingNextButton: some View {
-        Button(action: {
-            // 🔥 مسار التسجيل النهائي: إكمال الـ Onboarding والانتقال إلى MainPage
-            hasCompletedOnboarding = true
-        }) {
-            Text("Button.Next")
-                .font(isCompact ? .title3 : .title2)
+        Button(action: { hasCompletedOnboarding = true }) {
+            Text("Next")
                 .bold()
-                .frame(maxWidth: .infinity)
-                .frame(height: isCompact ? 50 : 60)
+                .frame(maxWidth: .infinity, minHeight:  50)
                 .background(customYellow)
-                .foregroundColor(.black)
                 .cornerRadius(15)
         }
     }
-    
-    private var DismissButton: some View {
-        Button(action: {
-            dismiss() // العودة إلى الصفحة السابقة (عادةً MainPage)
-        }) {
-            Text("Button.Done")
-                .font(isCompact ? .title3 : .title2)
-                .bold()
-                .frame(maxWidth: .infinity)
-                .frame(height: isCompact ? 50 : 60)
-                .background(customYellow)
-                .foregroundColor(.black)
-                .cornerRadius(15)
-        }
-    }
-    
-    // MARK: - Helper Views (InputField, RatioCardView)
 
+    private var DismissButton: some View {
+        Button(action: { dismiss() }) {
+            Text("Done")
+                .bold()
+                .foregroundColor(.black)
+                .frame(maxWidth: .infinity, minHeight:  50)
+                .background(customYellow)
+                .cornerRadius(15)
+        }
+    }
+
+    // MARK: - Helper Views
     struct InputField: View {
         let label: String
         @Binding var text: String
@@ -234,52 +210,35 @@ struct CarbRatioPage: View {
         var body: some View {
             VStack(alignment: .leading, spacing: 8) {
                 Text(label)
-                    .font(.callout)
                     .foregroundColor(.gray)
-                
                 TextField("", text: $text)
                     .padding(10)
-                    .background(Color(red: 0.95, green: 0.95, blue: 0.95))
+                    .background(Color.gray.opacity(0.1))
                     .cornerRadius(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
-                    )
             }
         }
     }
-    
+
     struct RatioCardView: View {
         let entry: CarbRatioEntry
-        let customYellow: Color
         let onDelete: () -> Void
         
         var body: some View {
             HStack {
-                VStack(alignment: .leading, spacing: 5) {
-                    Text(entry.name)
-                        .font(.headline)
-                        .foregroundColor(.black.opacity(0.9))
-                    Text("\(String(format: "%.1f", entry.ratio)) g/unit")
-                        .font(.subheadline)
+                VStack(alignment: .leading) {
+                    Text(entry.name).bold()
+                    Text("\(entry.ratio, specifier: "%.1f") g/unit")
                         .foregroundColor(.gray)
                 }
-                
                 Spacer()
-                
-                // التأكد من عدم إظهار زر الحذف للنسبة الافتراضية
-                if entry.id != CarbRatioEntry.defaultPrototype().id {
-                    Button(action: onDelete) {
-                        Image(systemName: "trash.fill")
-                            .foregroundColor(.red)
-                            .padding(8)
-                    }
+                Button(action: onDelete) {
+                    Image(systemName: "trash.fill")
+                        .foregroundColor(.red)
                 }
             }
             .padding()
             .background(Color.white)
             .cornerRadius(12)
-            .shadow(color: .black.opacity(0.05), radius: 3)
         }
     }
 }

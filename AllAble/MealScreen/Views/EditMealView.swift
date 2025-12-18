@@ -69,6 +69,7 @@ struct EditMealView: View {
                                 .padding()
                                 .background(Color.white)
                                 .cornerRadius(12)
+                                .tint(.black)
                             
                             Text("g")
                                 .font(.title3.bold())
@@ -126,12 +127,14 @@ struct EditMealView: View {
             
             // ✅ يعمل الآن لأن CarbRatioEntry متوافق مع Hashable
             Picker(selection: $selectedCarbRatio, label: Text("Choose Ratio")) {
-                ForEach(carbRatioStore.ratios) { ratioEntry in
+                ForEach(carbRatioStore.allRatios) { ratioEntry in
                     Text("\(ratioEntry.name) (\(String(format: "%.1f", ratioEntry.ratio)) g/unit)")
                         .tag(ratioEntry)
                 }
             }
             .pickerStyle(.menu)
+            .tint(.black)
+            .foregroundColor(.black)
             .padding(10)
                     .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color.white)

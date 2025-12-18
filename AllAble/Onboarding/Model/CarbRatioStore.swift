@@ -1,4 +1,4 @@
-//////
+//
 //  CarbRatioStore.swift
 //  AllAble
 //
@@ -31,7 +31,7 @@ struct CarbRatioEntry: Identifiable, Codable, Equatable, Hashable {
     static func defaultPrototype() -> CarbRatioEntry {
         return CarbRatioEntry(
             id: UUID(uuidString: "00000000-0000-0000-0000-000000000000")!,
-            name: NSLocalizedString("FallbackRatio", comment: ""),
+            name: NSLocalizedString("FallbackRatio", comment: "Default Ratio"),
             ratio: 15.0
         )
     }
@@ -41,28 +41,36 @@ struct CarbRatioEntry: Identifiable, Codable, Equatable, Hashable {
 final class CarbRatioStore: ObservableObject {
     @Published var ratios: [CarbRatioEntry] = []
     
-    // ✅ FIX: النسبة الافتراضية أصبحت خاصية مخزنة و @Published لتكون قابلة للتعديل
     @Published var defaultRatio: CarbRatioEntry = CarbRatioEntry.defaultPrototype()
     
+    // ✅ FIX: خاصية محتسبة لتجميع النسبة الافتراضية والنسب المخصصة للـ Picker
+    var allRatios: [CarbRatioEntry] {
+        var combined = [defaultRatio]
+        combined.append(contentsOf: ratios)
+        return combined
+    }
+    
     private let storageKey = "storedCarbRatioEntries"
-    private let defaultRatioStorageKey = "storedDefaultCarbRatio" // ✅ مفتاح جديد لحفظ القيمة الافتراضية
+    private let defaultRatioStorageKey = "storedDefaultCarbRatio"
     
     init() {
-        loadDefaultRatio() // ✅ حمل القيمة الافتراضية أولاً
-        loadCustomRatios() // ✅ حمل النسب المخصصة
+        loadDefaultRatio()
+        loadCustomRatios()
     }
 
-    // MARK: - Persistence (الحفظ والتحميل)
+    // MARK: - Persistence
 
     private func loadDefaultRatio() {
-        // محاولة تحميل النسبة الافتراضية المحفوظة
         if let savedData = UserDefaults.standard.data(forKey: defaultRatioStorageKey),
            let decodedDefault = try? JSONDecoder().decode(CarbRatioEntry.self, from: savedData) {
             
-            self.defaultRatio = decodedDefault
+            self.defaultRatio = CarbRatioEntry(
+                id: CarbRatioEntry.defaultPrototype().id,
+                name: decodedDefault.name,
+                ratio: decodedDefault.ratio
+            )
             
         } else {
-            // إذا لم يتم العثور على قيمة محفوظة، استخدم النموذج الأولي الافتراضي
             self.defaultRatio = CarbRatioEntry.defaultPrototype()
         }
     }
@@ -77,7 +85,6 @@ final class CarbRatioStore: ObservableObject {
         if let savedData = UserDefaults.standard.data(forKey: storageKey),
            let decodedRatios = try? JSONDecoder().decode([CarbRatioEntry].self, from: savedData) {
             
-            // نحمل النسب المخصصة فقط
             ratios = decodedRatios.filter { $0.id != defaultRatio.id }
             
         } else {
@@ -86,7 +93,6 @@ final class CarbRatioStore: ObservableObject {
     }
 
     private func saveCustomRatios() {
-        // نحفظ النسب المخصصة فقط
         if let encoded = try? JSONEncoder().encode(ratios) {
             UserDefaults.standard.set(encoded, forKey: storageKey)
         }
@@ -96,28 +102,24 @@ final class CarbRatioStore: ObservableObject {
 
     func addRatio(name: String, ratio: Double) {
         let newEntry = CarbRatioEntry(name: name, ratio: ratio)
-        ratios.insert(newEntry, at: 0) // نضيفها في البداية (قبل الافتراضية منطقياً في القائمة المرئية)
+        ratios.insert(newEntry, at: 0)
         saveCustomRatios()
-        objectWillChange.send() // لتحديث القائمة المرئية
+        objectWillChange.send()
     }
     
-    // ✅ FIX: تحديث Ratio الآن يتعامل مع النسبة الافتراضية بشكل صحيح
     func updateRatio(_ entry: CarbRatioEntry) {
         if entry.id == defaultRatio.id {
-            // تحديث النسبة الافتراضية
             self.defaultRatio.ratio = entry.ratio
-            saveDefaultRatio() // ✅ حفظ القيمة الجديدة الافتراضية
-            objectWillChange.send() // إرسال التغيير لتحديث الواجهة
+            saveDefaultRatio()
+            objectWillChange.send()
             
         } else if let index = ratios.firstIndex(where: { $0.id == entry.id }) {
-            // تحديث النسبة المخصصة
             ratios[index] = entry
             saveCustomRatios()
             objectWillChange.send()
         }
     }
     
-    // دالة الحذف
     func deleteRatio(_ entry: CarbRatioEntry) {
         guard entry.id != defaultRatio.id else { return }
         ratios.removeAll { $0.id == entry.id }
