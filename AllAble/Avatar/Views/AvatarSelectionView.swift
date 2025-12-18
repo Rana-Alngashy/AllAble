@@ -27,7 +27,7 @@ struct AvatarSelectionView: View {
                     .font(isCompact ? .title2 : .largeTitle)
                     .bold()
                     .padding(.top, isCompact ? 40 : 80)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.black)
                 
                 Spacer()
                 

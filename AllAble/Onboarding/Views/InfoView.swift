@@ -77,7 +77,7 @@ struct InfoView: View {
             Text("Title.UserInfo")
                 .font(isCompact ? .title2 : .largeTitle)
                 .bold()
-                .foregroundColor(.gray)
+                .foregroundColor(.black)
                 .padding(.top, isCompact ? 10 : 20)
         }
     }

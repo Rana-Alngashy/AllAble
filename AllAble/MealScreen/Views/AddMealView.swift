@@ -33,8 +33,9 @@ struct AddMealView: View {
                                                 .frame(width: 90, height: 90)
                                             
                                             Text(meal.title)
+                                            
                                                 .font(.system(size: 20, weight: .medium))
-                                                .foregroundColor(.gray.opacity(0.8))
+                                                .foregroundColor(.black)
                                             
                                             Spacer()
                                         }

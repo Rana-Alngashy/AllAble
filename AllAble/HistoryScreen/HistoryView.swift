@@ -35,7 +35,7 @@ struct HistoryView: View {
                     Text("Title.Meals")
                         .font(isCompact ? .title : .largeTitle)
                         .fontWeight(.heavy)
-                        .foregroundColor(.gray.opacity(0.9))
+                        .foregroundColor(.black)
                     
                     if !isArabic { Spacer() }
                 }
@@ -54,7 +54,7 @@ struct HistoryView: View {
                         
                         Text("Title.Meals")
                             .font(.body)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.black)
                     }
                     
                     Spacer()

@@ -185,6 +185,7 @@ struct CarbRatioPage: View {
         Button(action: { hasCompletedOnboarding = true }) {
             Text("Next")
                 .bold()
+                .foregroundColor(.black)
                 .frame(maxWidth: .infinity, minHeight:  50)
                 .background(customYellow)
                 .cornerRadius(15)

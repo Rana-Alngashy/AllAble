@@ -40,8 +40,10 @@ struct EditMealView: View {
                     
                     // ————— TITLE —————
                     Text("Title.MealContents")
-                        .font(.system(size: isCompact ? 26 : 40, weight: .bold))
-                        .foregroundColor(.gray.opacity(0.9))
+                        .font(isCompact ? .title2 : .largeTitle)
+                        .bold()
+                        //.font(.system(size: isCompact ? 26 : 40, weight: .bold))
+                        .foregroundColor(.black)
                         .frame(maxWidth: .infinity)
                             .multilineTextAlignment(.center)
                             .padding(.top, isCompact ? 10 : 20)
@@ -73,7 +75,7 @@ struct EditMealView: View {
                             
                             Text("g")
                                 .font(.title3.bold())
-                                .foregroundColor(.gray.opacity(0.8))
+                                .foregroundColor(.black)
                         }
                     }
                     
@@ -178,7 +180,7 @@ struct EditMealView: View {
                         
                         Text("g")
                             .font(.title3.bold())
-                            .foregroundColor(.gray.opacity(0.8))
+                            .foregroundColor(.black)
                     }
                     .frame(width: isCompact ? 140 : 200)
                 }
@@ -205,12 +207,12 @@ struct EditMealView: View {
             Text("\(viewModel.totalCarbs)")
                 .font(isCompact ? .title2 : .largeTitle)
                 .bold()
-                .foregroundColor(Color(#colorLiteral(red: 0.99, green: 0.85, blue: 0.33, alpha: 1)))
+                .foregroundColor(.black)
             
             Text("g")
                 .font(isCompact ? .title2 : .largeTitle)
                 .bold()
-                .foregroundColor(.gray.opacity(0.8))
+                .foregroundColor(.black)
         }
         .padding(.top, isCompact ? 10 : 20)
     }
