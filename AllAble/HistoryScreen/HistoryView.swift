@@ -212,7 +212,7 @@ private struct MealLargeCard: View {
     }
 }
 
-// MARK: - History Detail Sheet (خلفية الشيت فقط بدون بطاقة داخلية)
+// MARK: - Updated History Detail Sheet
 private struct HistoryDetailSheet: View {
     let entry: HistoryEntry
     let isArabic: Bool
@@ -221,73 +221,68 @@ private struct HistoryDetailSheet: View {
     
     @Environment(\.dismiss) private var dismiss
     
-    // نجعل خلفية الشيت نفس خلفية الشاشة الرئيسية
     private let sheetBackground = Color(red: 0.98, green: 0.96, blue: 0.90)
-    private let cardStroke = Color.gray.opacity(0.35)
-    // العناوين والنصوص خارج المستطيلات البيضاء تكون سوداء
-    private let titleColor = Color.black.opacity(0.9)
+    private let primaryBlack = Color.black
+    private let secondaryBlack = Color.black.opacity(0.7)
     
     var body: some View {
-        VStack(spacing: 18) {
-            // صف العنوان مع زر الإغلاق "x" فقط
-            HStack {
-                CircleButton(systemName: "xmark", action: close)
-                
-                Spacer()
-                
-                Text(localizedType(entry.mealTypeTitle))
-                    .foregroundColor(titleColor) // أسود
-                    .font(isCompact ? .title3 : .title2)
-                    .fontWeight(.semibold)
-                
-                Spacer()
-                
-                // توازن بصري مكان زر الصح المحذوف
-                Spacer().frame(width: 36, height: 36)
-            }
-            .padding(.horizontal, 18)
-            .padding(.top, 14)
-            
-            // الحقل الرئيسي (اسم + كارب الوجبة)
-            InputGroup {
-                LabeledField(title: "Name of the meal:", value: entry.mealName)
-                Divider().overlay(Color.black.opacity(0.2))
-                LabeledField(title: "Main Meal Carbs :", value: entry.mainMealCarbs > 0 ? "\(Int(entry.mainMealCarbs))" : "-")
-            }
-            
-            // لا تعرض قسم Subitems إلا إذا كانت هناك عناصر فرعية
-            if entry.subItems.isEmpty == false {
-                // عنوان Subitems
-                HStack {
-                    Text("Subitems")
-                        .font(isCompact ? .title3 : .title2)
-                        .foregroundColor(titleColor) // أسود
-                        .fontWeight(.semibold)
-                    Spacer()
-                }
-                .padding(.horizontal, 6)
-                
-                // مجموعة لكل عنصر فرعي
-                VStack(spacing: 12) {
-                    ForEach(entry.subItems) { item in
+        NavigationView {
+            ScrollView {
+                VStack(spacing: 24) {
+                    
+                    // ————— MAIN MEAL SECTION —————
+                    VStack(alignment: .leading, spacing: 12) {
+                        SectionHeader(title: "Meal Details")
+                        
                         InputGroup {
-                            LabeledField(title: "Name of the meal:", value: item.name.isEmpty ? "-" : item.name)
-                            Divider().overlay(Color.black.opacity(0.2))
-                            LabeledField(title: "Carbs :", value: "\(Int(item.carbs) ?? 0)")
+                            LabeledField(title: "Name of the meal", value: entry.mealName)
+                            Divider().background(primaryBlack.opacity(0.1))
+                            LabeledField(title: "Main Meal Carbs", value: entry.mainMealCarbs > 0 ? "\(Int(entry.mainMealCarbs)) g" : "-")
                         }
                     }
+                    
+                    // ————— SUBITEMS SECTION —————
+                    if !entry.subItems.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            SectionHeader(title: "Subitems")
+                            
+                            VStack(spacing: 12) {
+                                ForEach(entry.subItems) { item in
+                                    InputGroup {
+                                        LabeledField(title: "Item Name", value: item.name.isEmpty ? "-" : item.name)
+                                        Divider().background(primaryBlack.opacity(0.1))
+                                        LabeledField(title: "Carbs", value: "\(Int(item.carbs) ?? 0) g")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    // ————— TOTALS SECTION —————
+                    VStack(spacing: 16) {
+                        HStack(spacing: 16) {
+                            SummaryCard(title: "Total Carbs", value: "\(Int(entry.totalCarbs)) g", icon: "fork.knife")
+                            SummaryCard(title: "Insulin Dose", value: "\(formatDose(entry.insulinDose)) U", icon: "drop.fill")
+                        }
+                    }
+                    
+                    Spacer(minLength: 30)
+                }
+                .padding()
+            }
+            .background(sheetBackground.ignoresSafeArea())
+            .navigationTitle(localizedType(entry.mealTypeTitle))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        close()
+                    }
+                    .fontWeight(.bold)
+                    .foregroundColor(primaryBlack)
                 }
             }
-            
-            // حقول مفصولة بسيطة (Carbs, Insulin dose) مع وحدات
-            SimpleField(title: "Carbs:", value: "\(Int(entry.totalCarbs)) g")
-            SimpleField(title: "Insulin dose:", value: "\(formatDose(entry.insulinDose)) U")
-            
-            Spacer(minLength: 4)
         }
-        .padding(.top, 8)
-        .padding(.horizontal, 12)
-        .background(sheetBackground.ignoresSafeArea())
     }
     
     private func close() {
@@ -295,117 +290,88 @@ private struct HistoryDetailSheet: View {
         onClose()
     }
     
-    // MARK: - Subviews
+    // MARK: - Helpers & Subviews
     
     private func localizedType(_ type: String) -> String {
-        switch type.lowercased() {
-        case "breakfast", NSLocalizedString("Type.Breakfast", comment: "").lowercased():
-            return NSLocalizedString("Type.Breakfast", comment: "")
-        case "lunch", NSLocalizedString("Type.Lunch", comment: "").lowercased():
-            return NSLocalizedString("Type.Lunch", comment: "")
-        case "dinner", NSLocalizedString("Type.Dinner", comment: "").lowercased():
-            return NSLocalizedString("Type.Dinner", comment: "")
-        case "snacks", NSLocalizedString("Type.Snacks", comment: "").lowercased():
-            return NSLocalizedString("Type.Snacks", comment: "")
-        default:
-            return type
-        }
+        let key = "Type.\(type.capitalized)"
+        let localized = NSLocalizedString(key, comment: "")
+        return localized.contains("Type.") ? type : localized
     }
-    
-    // تنسيق جرعة الإنسولين (عرض 3 كـ "3" و 3.5 كـ "3.5")
+
     private func formatDose(_ dose: Double) -> String {
-        if dose.truncatingRemainder(dividingBy: 1) == 0 {
-            return String(format: "%.0f", dose)
-        } else {
-            return String(format: "%.1f", dose)
-        }
+        dose.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", dose) : String(format: "%.1f", dose)
     }
-    
-    private struct CircleButton: View {
-        let systemName: String
-        let action: () -> Void
-        
+
+    private struct SectionHeader: View {
+        let title: String
         var body: some View {
-            Button(action: action) {
-                ZStack {
-                    Circle()
-                        .stroke(Color.black, lineWidth: 2) // حدود دائرية سوداء
-                        .frame(width: 36, height: 36)
-                    Image(systemName: systemName)
-                        .foregroundColor(.black) // أيقونة سوداء
-                        .font(.system(size: 16, weight: .semibold))
-                }
-            }
-            .buttonStyle(.plain)
+            Text(title.uppercased())
+                .font(.caption)
+                .fontWeight(.bold)
+                .foregroundColor(.black.opacity(0.6))
+                .padding(.leading, 8)
         }
     }
-    
+
     private struct InputGroup<Content: View>: View {
         @ViewBuilder var content: Content
-        
         var body: some View {
-            VStack(spacing: 0) { content }
-                .padding(14)
-                .background(
-                    RoundedRectangle(cornerRadius: 22)
-                        .fill(Color.white)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 22)
-                                .stroke(Color.black, lineWidth: 1) // حدود سوداء
-                        )
-                        .shadow(color: .black.opacity(0.06), radius: 4, x: 0, y: 2)
+            VStack(alignment: .leading, spacing: 12) { content }
+                .padding(16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.white)
+                .cornerRadius(16)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.black, lineWidth: 1.2)
                 )
-                .padding(.horizontal, 6)
         }
     }
     
     private struct LabeledField: View {
         let title: String
         let value: String
-        
         var body: some View {
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .foregroundColor(.gray.opacity(0.9))
-                    .font(.callout)
-                Text(value.isEmpty ? "-" : value)
-                    .foregroundColor(.black.opacity(0.8))
-                    .font(.callout.weight(.semibold))
+                    .font(.caption2)
+                    .fontWeight(.medium)
+                    .foregroundColor(.black.opacity(0.5))
+                Text(value)
+                    .font(.body)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.black)
             }
         }
     }
-    
-    private struct SimpleField: View {
+
+    private struct SummaryCard: View {
         let title: String
         let value: String
-        
+        let icon: String
         var body: some View {
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.title3)
                 Text(title)
-                    .foregroundColor(.black.opacity(0.9)) // عنوان خارج المستطيل الأبيض → أسود
-                    .font(.callout)
-                
-                Text(value.isEmpty ? "-" : value)
-                    .foregroundColor(.black.opacity(0.8))
-                    .font(.callout.weight(.semibold))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 16)
-                    .background(
-                        RoundedRectangle(cornerRadius: 26)
-                            .fill(Color.white)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 26)
-                                    .stroke(Color.black, lineWidth: 1) // حدود سوداء
-                            )
-                            .shadow(color: .black.opacity(0.06), radius: 5, x: 0, y: 2)
-                    )
+                    .font(.caption2)
+                    .fontWeight(.medium)
+                Text(value)
+                    .font(.title3)
+                    .fontWeight(.bold)
             }
-            .padding(.horizontal, 6)
+            .foregroundColor(.black)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 20)
+            .background(Color.white)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.black, lineWidth: 1.2)
+            )
         }
     }
 }
-
 #Preview {
     let store = HistoryStore()
     let viewModel = HistoryViewModel(store: store)
